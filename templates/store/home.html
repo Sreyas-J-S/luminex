@@ -52,22 +52,10 @@
       {% for cat in categories %}
       <a href="{% url 'store:category_detail' cat.slug %}" class="category-strip__item">
         <div class="category-strip__icon-box">
-          {% if cat.slug == 'smartphones' %}
-            <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.slug == 'laptops' %}
-            <img src="{% static 'images/products/luminex_book_pro_16.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.slug == 'audio' %}
-            <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.slug == 'wearables' %}
-            <img src="{% static 'images/products/luminex_watch_ultra_2.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.slug == 'tablets' %}
-            <img src="{% static 'images/products/luminex_pad_pro_13.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.slug == 'accessories' %}
-            <img src="{% static 'images/products/luminex_magcharge.svg' %}" alt="{{ cat.name }}" />
-          {% elif cat.image %}
+          {% if cat.image %}
             <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy" />
           {% else %}
-            <img src="{% static 'images/categories/cat_'|add:cat.slug|add:'.svg' %}" alt="{{ cat.name }}" onerror="this.src='{% static 'images/categories/cat_smartphones.svg' %}'" />
+            <img src="{% static 'images/categories/cat_'|add:cat.slug|add:'.jpg' %}" alt="{{ cat.name }}" />
           {% endif %}
         </div>
         <span class="category-strip__label">{{ cat.name }}</span>
@@ -101,7 +89,7 @@
       {% for product in featured_products %}
       <a
         href="{{ product.get_absolute_url }}"
-        class="apple-card {% if 'Pro' in product.name and 'Smartphones' in product.category.name %}apple-card--dark{% endif %}"
+        class="apple-card"
         aria-label="{{ product.name }}"
       >
         <div class="apple-card__eyebrow">
@@ -133,7 +121,7 @@
           {% if product.main_image %}
             <img class="apple-card__img" src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" />
           {% else %}
-            <img class="apple-card__img" src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ product.name }}" />
+            <img class="apple-card__img" src="{% static 'images/products/luminex_pro_15.jpg' %}" alt="{{ product.name }}" />
           {% endif %}
         </div>
       </a>
@@ -199,7 +187,7 @@
         <h3 class="diff-card__title">Exchange your device. Upgrade and save.</h3>
         <p class="diff-card__desc">Get instant credit toward a brand new Luminex device when you exchange your old smartphone or laptop.&#8225;</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_air_15.svg' %}" alt="Trade in" style="max-height:160px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_air_15.jpg' %}" alt="Trade in" style="max-height:160px; object-fit:contain;" />
         </div>
       </a>
 
@@ -324,7 +312,7 @@
         </div>
         <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;59,900.00 (Incl. of all taxes)</div>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_phones_max.svg' %}" alt="Phones Max" style="max-height:170px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_phones_max.jpg' %}" alt="Phones Max" style="max-height:170px; object-fit:contain;" />
         </div>
       </a>
 
@@ -335,7 +323,7 @@
         <p class="diff-card__desc">Adaptive Audio, Active Noise Cancellation, and Transparency mode.</p>
         <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;24,900.00 (Incl. of all taxes)</div>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="Buds Pro 3" style="max-height:170px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_buds_pro_3.jpg' %}" alt="Buds Pro 3" style="max-height:170px; object-fit:contain;" />
         </div>
       </a>
 
@@ -383,7 +371,7 @@
         </div>
         <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;8,900.00 (Incl. of all taxes)</div>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/editorial/accessories_paired.svg' %}" alt="Duo Case Sand" style="max-height:170px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_smart_folio.jpg' %}" alt="Duo Case Sand" style="max-height:170px; object-fit:contain;" />
         </div>
       </a>
 
@@ -411,7 +399,7 @@
         <p class="diff-card__desc">Snap-on magnetic alignment for maximum charging efficiency up to 30W.</p>
         <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;3,900.00 (Incl. of all taxes)</div>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_magcharge.svg' %}" alt="MagCharge" style="max-height:160px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_magcharge_30w.jpg' %}" alt="MagCharge" style="max-height:160px; object-fit:contain;" />
         </div>
       </a>
 
@@ -509,7 +497,7 @@
         <h3 class="diff-card__title">From enterprise to small business, we'll work with you.</h3>
         <p class="diff-card__desc">Dedicated business pricing, zero-touch deployment with Luminex Business Manager, and tax invoice support.</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_book_pro_16.svg' %}" alt="Business solutions" style="max-height:160px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_book_pro_16.jpg' %}" alt="Business solutions" style="max-height:160px; object-fit:contain;" />
         </div>
       </a>
 
@@ -519,7 +507,7 @@
         <h3 class="diff-card__title">Exchange your smartphone. Get up to &#8377;67,500.00 credit.&#8225;</h3>
         <p class="diff-card__desc">Trade in an eligible device for instant credit towards your new purchase, or recycle it responsibly for free.</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="Luminex Trade In" style="max-height:160px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_pro_15.jpg' %}" alt="Luminex Trade In" style="max-height:160px; object-fit:contain;" />
         </div>
       </a>
 
