@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{% block meta_description %}Luminex — Premium electronics and tech products. Illuminate your world with the finest devices.{% endblock %}" />
+  <meta name="theme-color" content="#1d1d1f" />
+  <title>{% block title %}{{ page_title|default:"Luminex — Illuminate Your World" }}{% endblock %}</title>
+
+  <!-- Preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%230071e3'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='900' font-family='sans-serif'%3EL%3C/text%3E%3C/svg%3E" />
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ====================== NAVBAR ====================== -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="navbar__inner">
+
+      <!-- Logo -->
+      <a href="{% url 'store:home' %}" class="navbar__logo" aria-label="Luminex Home">
+        <span class="navbar__logo-text">Luminex</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="navbar__nav">
+        <a href="{% url 'store:product_list' %}" class="navbar__nav-link">All Products</a>
+        {% for cat in nav_categories %}
+          <a href="{% url 'store:category_detail' cat.slug %}" class="navbar__nav-link">{{ cat.name }}</a>
+        {% endfor %}
+      </div>
+
+      <!-- Actions -->
+      <div class="navbar__actions">
+        <!-- Search -->
+        <div class="navbar__search">
+          <form class="navbar__search-form" action="{% url 'store:search' %}" method="get" role="search">
+            <input
+              class="navbar__search-input"
+              type="search"
+              name="q"
+              placeholder="Search…"
+              aria-label="Search products"
+              value="{{ request.GET.q|default:'' }}"
+            />
+            <button class="navbar__search-btn" type="submit" aria-label="Submit search">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Auth links -->
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}" class="navbar__auth-link">{{ user.first_name|default:user.username }}</a>
+          <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="navbar__auth-link" style="cursor:pointer; background:none; border:none; font-size:inherit; padding:0.375rem 0.75rem; border-radius:6px;">Sign Out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="navbar__auth-link">Sign In</a>
+          <a href="{% url 'accounts:register' %}" class="btn btn--primary btn--sm">Get Started</a>
+        {% endif %}
+
+        <!-- Hamburger -->
+        <button class="navbar__hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====================== MOBILE NAV ====================== -->
+  <div class="navbar__mobile-overlay" id="mobile-nav" role="dialog" aria-label="Mobile navigation">
+    <button class="navbar__mobile-close" aria-label="Close menu">✕</button>
+    <a href="{% url 'store:home' %}" class="navbar__mobile-link">Home</a>
+    <a href="{% url 'store:product_list' %}" class="navbar__mobile-link">All Products</a>
+    {% for cat in nav_categories %}
+      <a href="{% url 'store:category_detail' cat.slug %}" class="navbar__mobile-link">{{ cat.name }}</a>
+    {% endfor %}
+    <hr style="width:40px; border-color: #e8e8ed; margin: 0.5rem 0;" />
+    {% if user.is_authenticated %}
+      <a href="{% url 'accounts:profile' %}" class="navbar__mobile-link" style="font-size:1.2rem;">My Account</a>
+    {% else %}
+      <a href="{% url 'accounts:login' %}" class="navbar__mobile-link" style="font-size:1.2rem;">Sign In</a>
+      <a href="{% url 'accounts:register' %}" class="navbar__mobile-link" style="font-size:1.2rem; color: var(--color-blue);">Get Started</a>
+    {% endif %}
+  </div>
+
+  <!-- ====================== MESSAGES ====================== -->
+  {% if messages %}
+    <div class="messages-container" role="alert" aria-live="polite">
+      {% for message in messages %}
+        <div class="alert alert--{{ message.tags }}">
+          <span>{{ message }}</span>
+          <button class="alert__close" aria-label="Dismiss">✕</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- ====================== MAIN ====================== -->
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__grid">
+
+        <!-- Brand -->
+        <div>
+          <div class="footer__brand">Luminex</div>
+          <p class="footer__tagline">Premium electronics and tech products, curated for those who demand excellence. Illuminate your world.</p>
+          <div class="footer__social">
+            <a href="#" class="footer__social-link" aria-label="Twitter">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/></svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+            <a href="#" class="footer__social-link" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Products -->
+        <div>
+          <div class="footer__col-title">Products</div>
+          <a href="{% url 'store:product_list' %}" class="footer__link">All Products</a>
+          {% for cat in nav_categories %}
+            <a href="{% url 'store:category_detail' cat.slug %}" class="footer__link">{{ cat.name }}</a>
+          {% endfor %}
+        </div>
+
+        <!-- Account -->
+        <div>
+          <div class="footer__col-title">Account</div>
+          {% if user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}" class="footer__link">My Profile</a>
+          {% else %}
+            <a href="{% url 'accounts:login' %}" class="footer__link">Sign In</a>
+            <a href="{% url 'accounts:register' %}" class="footer__link">Create Account</a>
+          {% endif %}
+        </div>
+
+        <!-- Support -->
+        <div>
+          <div class="footer__col-title">Support</div>
+          <a href="#" class="footer__link">Help Centre</a>
+          <a href="#" class="footer__link">Contact Us</a>
+          <a href="#" class="footer__link">Shipping Info</a>
+          <a href="#" class="footer__link">Returns</a>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p class="footer__copy">Copyright &copy; {% now "Y" %} Luminex Technologies Pvt. Ltd. All rights reserved.</p>
+        <div class="footer__bottom-links">
+          <a href="#" class="footer__bottom-link">Privacy Policy</a>
+          <a href="#" class="footer__bottom-link">Terms of Use</a>
+          <a href="#" class="footer__bottom-link">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to Top -->
+  <button class="scroll-top" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+    </svg>
+  </button>
+
+  {% load static %}
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="puckAlum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#e8e8ed"/>
+      <stop offset="100%" stop-color="#c8c8cd"/>
+    </linearGradient>
+    <filter id="magShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000000" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#magShadow)" transform="translate(130, 110)">
+    <!-- Woven Cable -->
+    <path d="M 120,240 C 120,310 180,330 240,330" fill="none" stroke="#d5d5da" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- Puck Base Ring -->
+    <circle cx="120" cy="120" r="115" fill="url(#puckAlum)" stroke="#dcdce0" stroke-width="2"/>
+    <circle cx="120" cy="120" r="105" fill="#f8f8fa"/>
+    <circle cx="120" cy="120" r="75" fill="none" stroke="#0071e3" stroke-width="4" stroke-dasharray="8 6"/>
+    <circle cx="120" cy="120" r="30" fill="#0071e3" opacity="0.1"/>
+    <!-- Lighting Bolt symbol -->
+    <path d="M 122,95 L 110,122 L 122,122 L 118,145 L 134,118 L 122,118 Z" fill="#0071e3"/>
+  </g>
+</svg>

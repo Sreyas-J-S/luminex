@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bag-page">
+  <div class="container">
+
+    <h1 class="bag-page__heading">Review your Bag.</h1>
+
+    <!-- Delivery Eligibility Banner -->
+    <div class="bag-page__banner">
+      {% if qualifies_free_shipping %}
+        <span style="font-size:1.2rem;">🚚</span>
+        <span><strong>Free delivery on this order.</strong> Contactless delivery right to your doorstep.</span>
+      {% else %}
+        <span style="font-size:1.2rem;">📦</span>
+        <span>Add ₹{{ 5000|add:"-"|add:subtotal }} more to your bag to qualify for <strong>FREE shipping</strong>.</span>
+      {% endif %}
+    </div>
+
+    {% if cart_items %}
+    <div class="bag-grid">
+
+      <!-- Items List -->
+      <div class="bag-items-list">
+        {% for item in cart_items %}
+        <div class="bag-item">
+
+          <!-- Thumbnail -->
+          <div class="bag-item__img-box">
+            {% if item.product.main_image %}
+              <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="bag-item__img" />
+            {% else %}
+              <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ item.product.name }}" class="bag-item__img" />
+            {% endif %}
+          </div>
+
+          <!-- Info & Actions -->
+          <div class="bag-item__details">
+            <a href="{{ item.product.get_absolute_url }}" class="bag-item__title">
+              {{ item.product.name }}
+            </a>
+
+            <div class="bag-item__status">
+              <span>●</span> In stock & ready to ship
+            </div>
+
+            <div class="bag-item__actions">
+              <!-- Quantity Stepper / Select -->
+              <form method="post" action="{% url 'store:cart_update' item.id %}" style="display:inline-flex; align-items:center; gap:0.5rem;">
+                {% csrf_token %}
+                <label for="qty-{{ item.id }}" style="font-size:0.8125rem; color:var(--color-mid-grey);">Qty:</label>
+                <select name="quantity" id="qty-{{ item.id }}" class="bag-qty-select" onchange="this.form.submit()">
+                  {% for n in "123456789"|make_list %}
+                    <option value="{{ n }}" {% if item.quantity|stringformat:"s" == n %}selected{% endif %}>{{ n }}</option>
+                  {% endfor %}
+                </select>
+              </form>
+
+              <!-- Remove -->
+              <form method="post" action="{% url 'store:cart_remove' item.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="bag-item__remove-btn">Remove</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="bag-item__price">
+            {{ item.formatted_subtotal }}
+          </div>
+
+        </div>
+        {% endfor %}
+
+        <!-- Need Help Footer -->
+        <div style="padding: 2rem 0; font-size: 0.875rem; color: var(--color-mid-grey); line-height: 1.5;">
+          <p>Need some help? <a href="{% url 'store:product_list' %}" style="color:var(--color-blue); text-decoration:none;">Chat with a Specialist &#x2197;</a> or call 000800 040 1966.</p>
+        </div>
+      </div>
+
+      <!-- Order Summary Card -->
+      <aside class="bag-summary-box" aria-label="Order summary">
+        <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.5rem; letter-spacing:-0.015em;">Summary</h2>
+
+        <div class="bag-summary__row">
+          <span>Subtotal</span>
+          <span style="font-weight:600; color:var(--color-charcoal);">₹{{ subtotal|floatformat:2 }}</span>
+        </div>
+
+        <div class="bag-summary__row">
+          <span>Shipping</span>
+          <span style="font-weight:600; color:{% if delivery_fee == 0 %}#30d158{% else %}var(--color-charcoal){% endif %};">
+            {% if delivery_fee == 0 %}FREE{% else %}₹{{ delivery_fee|floatformat:2 }}{% endif %}
+          </span>
+        </div>
+
+        <div class="bag-summary__row bag-summary__row--total">
+          <span>Total</span>
+          <span>₹{{ grand_total|floatformat:2 }}</span>
+        </div>
+
+        <a href="{% url 'store:checkout' %}" class="btn--apple-checkout">
+          Check Out
+        </a>
+
+        <!-- Apple-like Payment Perks -->
+        <div style="margin-top: 1.5rem; font-size: 0.8125rem; color: var(--color-mid-grey); line-height: 1.4;">
+          <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+            <span>💳</span>
+            <span>Monthly EMI options available at checkout</span>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span>🔒</span>
+            <span>Secure 256-bit SSL encrypted checkout</span>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    {% else %}
+    <!-- Empty Bag State -->
+    <div style="text-align:center; padding: 5rem 1rem; max-width: 500px; margin: 0 auto;">
+      <div style="font-size:4rem; margin-bottom:1rem;">🛍️</div>
+      <h2 style="font-size:1.75rem; font-weight:700; margin-bottom:0.75rem;">Your Bag is empty.</h2>
+      <p style="color:var(--color-mid-grey); margin-bottom:2rem; line-height:1.5;">
+        Explore our latest products and add something you love to your bag.
+      </p>
+      <a href="{% url 'store:product_list' %}" class="btn btn--primary btn--lg" style="border-radius:12px;">
+        Continue Shopping
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

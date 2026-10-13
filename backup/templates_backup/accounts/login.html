@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <!-- Brand -->
+    <div class="auth-card__logo">
+      <a href="{% url 'store:home' %}" class="auth-card__brand">Luminex</a>
+    </div>
+
+    <h1 class="auth-card__title">Sign In</h1>
+    <p class="auth-card__subtitle">Welcome back to Luminex</p>
+
+    <form class="auth-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          {% for error in form.password.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <div style="background:var(--color-error-bg); color:var(--color-error); padding:0.875rem 1rem; border-radius:var(--radius-md); font-size:var(--font-size-sm);">
+            {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <button type="submit" class="btn btn--primary btn--full btn--lg">Sign In</button>
+    </form>
+
+    <div class="auth-card__footer">
+      Don't have an account?
+      <a href="{% url 'accounts:register' %}" style="color:var(--color-blue); font-weight:600;">Create one free</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

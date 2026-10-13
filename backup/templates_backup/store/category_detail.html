@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="{% url 'store:home' %}" class="breadcrumbs__link">Home</a>
+      <span class="breadcrumbs__sep">›</span>
+      <a href="{% url 'store:product_list' %}" class="breadcrumbs__link">All Products</a>
+      <span class="breadcrumbs__sep">›</span>
+      <span>{{ category.name }}</span>
+    </nav>
+    <h1 class="page-hero__title">{{ category.name }}</h1>
+    {% if category.description %}
+      <p class="page-hero__subtitle">{{ category.description }}</p>
+    {% else %}
+      <p class="page-hero__subtitle">{{ total }} product{{ total|pluralize }} available</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Sort Bar -->
+<div class="container">
+  <div class="filter-bar">
+    <span class="filter-bar__count">{{ total }} product{{ total|pluralize }}</span>
+    <div>
+      <select class="sort-select" aria-label="Sort products">
+        {% for key, val in sort_options.items %}
+          <option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ val.1 }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Product Grid -->
+<section class="section section--sm">
+  <div class="container">
+    {% if products %}
+      <div class="product-grid">
+        {% for product in products %}
+          {% include 'store/partials/product_card.html' with product=product %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <svg class="empty-state__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <h2 class="empty-state__title">No products yet</h2>
+        <p class="empty-state__text">This category doesn't have any products yet. Check back soon!</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn--primary btn--lg">Browse All Products</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

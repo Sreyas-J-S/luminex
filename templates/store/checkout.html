@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="checkout-page">
+  <div class="container">
+
+    <div style="margin-bottom: 2rem;">
+      <a href="{% url 'store:cart_detail' %}" style="color:var(--color-blue); text-decoration:none; font-size:0.875rem;">
+        &lsaquo; Back to Bag
+      </a>
+      <h1 style="font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight:700; margin-top:0.5rem; letter-spacing:-0.02em;">
+        Checkout
+      </h1>
+    </div>
+
+    <form method="post" action="{% url 'store:checkout' %}">
+      {% csrf_token %}
+
+      <div class="checkout-grid">
+
+        <!-- Form Columns -->
+        <div class="checkout-form-col">
+
+          <!-- 1. Contact Information -->
+          <div class="checkout-card">
+            <h2 class="checkout-card__title">1. Contact Information</h2>
+            <div class="form-grid">
+              <div class="form-grid--full">
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">Full Name *</label>
+                {{ form.full_name }}
+                {{ form.full_name.errors }}
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">Email Address *</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">Mobile Phone *</label>
+                {{ form.phone }}
+                {{ form.phone.errors }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Shipping Address -->
+          <div class="checkout-card">
+            <h2 class="checkout-card__title">2. Shipping Address</h2>
+            <div class="form-grid">
+              <div class="form-grid--full">
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">Street Address *</label>
+                {{ form.address_line1 }}
+                {{ form.address_line1.errors }}
+              </div>
+              <div class="form-grid--full">
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">Apartment, suite, unit (optional)</label>
+                {{ form.address_line2 }}
+                {{ form.address_line2.errors }}
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">City *</label>
+                {{ form.city }}
+                {{ form.city.errors }}
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">State *</label>
+                {{ form.state }}
+                {{ form.state.errors }}
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8125rem; font-weight:600; margin-bottom:0.35rem;">PIN Code *</label>
+                {{ form.postal_code }}
+                {{ form.postal_code.errors }}
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Payment Method -->
+          <div class="checkout-card">
+            <h2 class="checkout-card__title">3. Payment Option</h2>
+            <div style="display:flex; flex-direction:column; gap:0.875rem;">
+              <label style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border:1.5px solid var(--color-blue); border-radius:10px; cursor:pointer; background:rgba(0,113,227,0.03);">
+                <input type="radio" name="payment_method" value="card" checked style="accent-color:var(--color-blue);" />
+                <div style="flex:1;">
+                  <strong style="display:block; font-size:0.9375rem;">Credit or Debit Card / No Cost EMI</strong>
+                  <span style="font-size:0.8125rem; color:var(--color-mid-grey);">Visa, MasterCard, RuPay, American Express</span>
+                </div>
+                <span>💳</span>
+              </label>
+
+              <label style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border:1px solid var(--color-light-grey); border-radius:10px; cursor:pointer;">
+                <input type="radio" name="payment_method" value="upi" style="accent-color:var(--color-blue);" />
+                <div style="flex:1;">
+                  <strong style="display:block; font-size:0.9375rem;">UPI & NetBanking</strong>
+                  <span style="font-size:0.8125rem; color:var(--color-mid-grey);">Instant bank verification via UPI ID or QR</span>
+                </div>
+                <span>📱</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Summary -->
+        <aside class="checkout-summary-col">
+          <div class="checkout-card" style="position:sticky; top:60px;">
+            <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:1.25rem;">Order Summary</h2>
+
+            <!-- Items list -->
+            <div style="max-height: 240px; overflow-y:auto; margin-bottom:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+              {% for item in cart_items %}
+              <div style="display:flex; gap:0.875rem; align-items:center;">
+                <div style="width:48px; height:48px; background:var(--color-off-white); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  {% if item.product.main_image %}
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" style="max-width:38px; max-height:38px; object-fit:contain;" />
+                  {% else %}
+                    <span style="font-size:1.2rem;">📦</span>
+                  {% endif %}
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:0.875rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    {{ item.product.name }}
+                  </div>
+                  <div style="font-size:0.75rem; color:var(--color-mid-grey);">
+                    Qty: {{ item.quantity }}
+                  </div>
+                </div>
+                <div style="font-size:0.875rem; font-weight:600;">
+                  {{ item.formatted_subtotal }}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Totals -->
+            <div style="border-top:1px solid var(--color-separator); padding-top:1rem; margin-top:1rem;">
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; color:var(--color-mid-grey); margin-bottom:0.5rem;">
+                <span>Subtotal</span>
+                <span style="font-weight:600; color:var(--color-charcoal);">₹{{ subtotal|floatformat:2 }}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.875rem; color:var(--color-mid-grey); margin-bottom:0.5rem;">
+                <span>Shipping</span>
+                <span style="font-weight:600; color:{% if delivery_fee == 0 %}#30d158{% else %}var(--color-charcoal){% endif %};">
+                  {% if delivery_fee == 0 %}FREE{% else %}₹{{ delivery_fee|floatformat:2 }}{% endif %}
+                </span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:700; color:var(--color-charcoal); border-top:1px solid var(--color-separator); padding-top:0.875rem; margin-top:0.875rem;">
+                <span>Total</span>
+                <span>₹{{ grand_total|floatformat:2 }}</span>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn--apple-checkout" style="margin-top:1.5rem;">
+              Place Your Order
+            </button>
+
+            <p style="font-size:0.75rem; color:var(--color-silver); margin-top:1rem; text-align:center;">
+              By placing your order, you agree to Luminex Store Terms and Conditions.
+            </p>
+          </div>
+        </aside>
+
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

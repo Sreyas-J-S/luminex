@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="padBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38383a"/>
+      <stop offset="100%" stop-color="#1c1c1e"/>
+    </linearGradient>
+    <linearGradient id="screenFluid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c6ff"/>
+      <stop offset="50%" stop-color="#0072ff"/>
+      <stop offset="100%" stop-color="#9b51e0"/>
+    </linearGradient>
+    <filter id="padShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#padShadow)" transform="translate(85, 45)">
+    <!-- Chassis -->
+    <rect x="0" y="0" width="330" height="410" rx="26" fill="url(#padBody)" stroke="#505054" stroke-width="1.5"/>
+    <!-- Screen Glass -->
+    <rect x="10" y="10" width="310" height="390" rx="18" fill="#000000"/>
+    <rect x="14" y="14" width="302" height="382" rx="14" fill="url(#screenFluid)"/>
+
+    <!-- Front Camera Dot -->
+    <circle cx="165" cy="7" r="2" fill="#202022"/>
+
+    <!-- Stylus Pencil docked on side -->
+    <g transform="translate(322, 110)">
+      <rect x="0" y="0" width="5" height="190" rx="2" fill="#ffffff" stroke="#e0e0e4" stroke-width="0.5"/>
+      <polygon points="0,0 5,0 2.5,-10" fill="#dedee2"/>
+    </g>
+  </g>
+</svg>

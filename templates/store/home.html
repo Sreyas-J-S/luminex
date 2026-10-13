@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ====================== STORE GREETING HEADER ====================== -->
+<header class="store-header" aria-labelledby="store-heading">
+  <div class="container">
+    <div class="store-header__inner">
+
+      <!-- Title Area -->
+      <div class="store-header__title-area">
+        <h1 class="store-header__h1" id="store-heading">
+          <span class="store-header__gradient">Store.</span>
+          <span class="store-header__subtext">The best way to buy the products you love.</span>
+        </h1>
+      </div>
+
+      <!-- Concierge & Support Links -->
+      <div class="store-header__concierge">
+        <div class="store-header__concierge-item">
+          <span>Need shopping help?</span>
+          <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
+            Ask a Specialist &#x2197;
+          </a>
+        </div>
+        <div class="store-header__concierge-item">
+          <span>Visit a Luminex Store</span>
+          <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
+            Find a store near you &#x2197;
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Festive Mandala Watermark Graphic (Apple India Festive Campaign inspired) -->
+    <img
+      class="store-header__mandala-bg"
+      src="{% static 'images/brand/mandala_accent.svg' %}"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <!-- ====================== HORIZONTAL CATEGORY ICON STRIP ====================== -->
+    <nav class="category-strip" aria-label="Product categories">
+      {% for cat in categories %}
+      <a href="{% url 'store:category_detail' cat.slug %}" class="category-strip__item">
+        <div class="category-strip__icon-box">
+          {% if cat.image %}
+            <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy" />
+          {% else %}
+            <img src="{% static 'images/categories/cat_'|add:cat.slug|add:'.svg' %}" alt="{{ cat.name }}" onerror="this.src='{% static 'images/categories/cat_smartphones.svg' %}'" />
+          {% endif %}
+        </div>
+        <span class="category-strip__label">{{ cat.name }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+  </div>
+</header>
+
+
+<!-- ====================== "THE LATEST" PRODUCT CAROUSEL ====================== -->
+<section class="apple-carousel-section" aria-labelledby="latest-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="latest-heading">
+        <span class="apple-carousel__title-gradient">The latest.</span>
+        <span class="apple-carousel__title-muted">Meet the new arrivals this season.</span>
+      </h2>
+
+      <!-- Circular Carousel Controls -->
+      <div class="apple-carousel__controls" aria-label="Latest products carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous products">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next products">&#x203A;</button>
+      </div>
+    </div>
+
+    <!-- Horizontal Scroll Track -->
+    <div class="apple-carousel__track" role="region" aria-label="Latest products carousel">
+      {% for product in featured_products %}
+      <a
+        href="{{ product.get_absolute_url }}"
+        class="apple-card {% if 'Pro' in product.name and 'Smartphones' in product.category.name %}apple-card--dark{% endif %}"
+        aria-label="{{ product.name }}"
+      >
+        <div class="apple-card__eyebrow">
+          {% if product.is_new_arrival %}NEW{% elif product.discount_percent %}FESTIVE OFFER{% else %}FEATURED{% endif %}
+        </div>
+
+        <h3 class="apple-card__title">{{ product.name }}</h3>
+
+        {% if product.short_description %}
+          <p class="apple-card__desc">{{ product.short_description }}</p>
+        {% endif %}
+
+        <div class="apple-card__price">
+          From {{ product.formatted_price }}
+          {% if product.original_price %}
+            <span style="text-decoration:line-through; margin-left:0.35rem; font-size:0.8125rem;">{{ product.formatted_original_price }}</span>
+          {% endif %}
+        </div>
+
+        <div class="apple-card__image-box">
+          {% if product.main_image %}
+            <img class="apple-card__img" src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" />
+          {% else %}
+            <img class="apple-card__img" src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ product.name }}" />
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== "THE LUMINEX DIFFERENCE" EDITORIAL CAROUSEL ====================== -->
+<section class="apple-carousel-section" style="background-color: var(--color-white);" aria-labelledby="diff-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="diff-heading">
+        <span class="apple-carousel__title-gradient">The Luminex Difference.</span>
+        <span class="apple-carousel__title-muted">Celebrate the season your way.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Editorial carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous offers">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next offers">&#x203A;</button>
+      </div>
+    </div>
+
+    <!-- Editorial Cards Track -->
+    <div class="apple-carousel__track" role="region" aria-label="Luminex difference cards">
+
+      <!-- Card 1: Festive EMI & Cashback -->
+      <div class="diff-card">
+        <div class="diff-card__eyebrow">FESTIVE OFFER</div>
+        <h3 class="diff-card__title">Get up to 12 months of No Cost EMI this season.</h3>
+        <p class="diff-card__desc">Plus up to ₹10,000.00 instant cashback on selected products with eligible cards.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/brand/mandala_accent.svg' %}" alt="" style="max-height:180px; object-fit:contain;" />
+        </div>
+      </div>
+
+      <!-- Card 2: Trade In -->
+      <div class="diff-card">
+        <div class="diff-card__eyebrow">LUMINEX TRADE IN</div>
+        <h3 class="diff-card__title">Exchange your device. Upgrade and save.</h3>
+        <p class="diff-card__desc">Get instant credit toward a brand new Luminex device when you exchange your old smartphone or laptop.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_air_15.svg' %}" alt="" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </div>
+
+      <!-- Card 3: Free Delivery & Returns -->
+      <div class="diff-card">
+        <div class="diff-card__eyebrow">FREE DELIVERY</div>
+        <h3 class="diff-card__title">Fast, free delivery straight to your door.</h3>
+        <p class="diff-card__desc">Enjoy contactless delivery on all orders, plus hassle-free 30-day returns on any purchase.</p>
+        <div class="diff-card__graphic">
+          <div style="font-size:4.5rem; text-align:center;">🚚</div>
+        </div>
+      </div>
+
+      <!-- Card 4: Personalised Setup -->
+      <div class="diff-card">
+        <div class="diff-card__eyebrow">ONLINE & IN-STORE</div>
+        <h3 class="diff-card__title">Personalised setup with a Specialist.</h3>
+        <p class="diff-card__desc">Our experts will walk you through data transfer, feature walkthroughs, and custom device configuration.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="" style="max-height:150px; object-fit:contain;" />
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== DYNAMIC HERO PROMOTIONS ====================== -->
+{% if hero_banners %}
+<section class="section" style="padding: 2rem 0 4rem;" aria-label="Dynamic featured promotions">
+  <div class="container">
+    <div class="section-header" style="text-align:left; margin-bottom: 1.5rem;">
+      <div class="section-header__eyebrow">Special Editions</div>
+      <h2 class="section-header__title" style="font-size:2rem;">Designed to Inspire</h2>
+    </div>
+
+    <div class="promo-grid">
+      {% for banner in hero_banners %}
+      <div class="promo-card" style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
+        {% if banner.image %}
+          <img class="promo-card__img" src="{{ banner.image.url }}" alt="{{ banner.title }}" loading="lazy" />
+        {% endif %}
+        <div class="promo-card__content">
+          {% if banner.subtitle %}
+            <div class="promo-card__eyebrow">{{ banner.subtitle }}</div>
+          {% endif %}
+          <h3 class="promo-card__title">{{ banner.title }}</h3>
+          {% if banner.description %}
+            <p class="promo-card__desc">{{ banner.description }}</p>
+          {% endif %}
+          {% if banner.cta_text and banner.cta_link %}
+            <a href="{{ banner.cta_link }}" class="btn btn--primary">{{ banner.cta_text }}</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
+<!-- ====================== NEW ARRIVALS GRID ====================== -->
+{% if new_arrivals %}
+<section class="section section--lg" style="background: var(--color-off-white);" aria-labelledby="new-arrivals-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__eyebrow">Explore the Lineup</div>
+      <h2 class="section-header__title" id="new-arrivals-heading">All New Additions</h2>
+      <p class="section-header__subtitle">Explore precision engineering and stunning industrial design.</p>
+    </div>
+
+    <div class="product-grid">
+      {% for product in new_arrivals %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+
+    <div class="section-footer">
+      <a href="{% url 'store:product_list' %}" class="btn btn--dark btn--lg">View Entire Catalog</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

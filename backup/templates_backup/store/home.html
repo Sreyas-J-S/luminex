@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- ====================== HERO SLIDER ====================== -->
+{% if hero_banners %}
+<section class="hero-slider" aria-label="Featured promotions">
+  {% for banner in hero_banners %}
+  <div class="hero-slide {% if not banner.image %}hero-slide--color{% endif %}"
+       style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
+    {% if banner.image %}
+      <img class="hero-slide__bg" src="{{ banner.image.url }}" alt="{{ banner.title }}" />
+      <div class="hero-slide__overlay"></div>
+    {% endif %}
+    <div class="hero-slide__content">
+      {% if banner.subtitle %}
+        <div class="hero-slide__eyebrow">{{ banner.subtitle }}</div>
+      {% endif %}
+      <h1 class="hero-slide__title">{{ banner.title }}</h1>
+      {% if banner.description %}
+        <p class="hero-slide__desc">{{ banner.description }}</p>
+      {% endif %}
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        {% if banner.cta_text and banner.cta_link %}
+          <a href="{{ banner.cta_link }}" class="btn btn--primary btn--lg">{{ banner.cta_text }}</a>
+        {% endif %}
+        <a href="{% url 'store:product_list' %}" class="btn btn--secondary btn--lg">Explore All</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if hero_banners|length > 1 %}
+  <div class="hero-dots" role="tablist" aria-label="Slide controls">
+    {% for banner in hero_banners %}
+      <button class="hero-dot {% if forloop.first %}is-active{% endif %}"
+              role="tab"
+              aria-label="Slide {{ forloop.counter }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+      </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% else %}
+<!-- Default hero when no banners exist -->
+<section class="hero-slider">
+  <div class="hero-slide" style="background: linear-gradient(135deg, #1d1d1f 0%, #2d2d2f 50%, #0071e3 100%);">
+    <div class="hero-slide__content">
+      <div class="hero-slide__eyebrow">Welcome to</div>
+      <h1 class="hero-slide__title" style="color:white;">Luminex</h1>
+      <p class="hero-slide__desc" style="color:rgba(255,255,255,0.8);">Illuminate Your World with Premium Technology</p>
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+        <a href="{% url 'store:product_list' %}" class="btn btn--primary btn--lg">Shop Now</a>
+        <a href="{% url 'store:product_list' %}" class="btn btn--secondary btn--lg">Explore All</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== FEATURED CATEGORIES ====================== -->
+{% if categories %}
+<section class="section section--sm" aria-labelledby="categories-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__eyebrow">Browse by Category</div>
+      <h2 class="section-header__title" id="categories-heading">Shop the Collection</h2>
+    </div>
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a href="{% url 'store:category_detail' cat.slug %}" class="category-card {% if not cat.image %}category-card--no-img{% endif %}" aria-label="{{ cat.name }} category">
+        {% if cat.image %}
+          <img class="category-card__img" src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy" />
+        {% endif %}
+        <div class="category-card__overlay">
+          <div class="category-card__body">
+            <span class="category-card__name">{{ cat.name }}</span>
+            <span class="category-card__count">{{ cat.products.count }} products</span>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== FEATURED PRODUCTS ====================== -->
+{% if featured_products %}
+<section class="section" style="background: var(--color-off-white);" aria-labelledby="featured-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__eyebrow">Editor's Picks</div>
+      <h2 class="section-header__title" id="featured-heading">Featured Products</h2>
+      <p class="section-header__subtitle">Handpicked for exceptional performance and design.</p>
+    </div>
+    <div class="product-grid">
+      {% for product in featured_products %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+    <div class="section-footer">
+      <a href="{% url 'store:product_list' %}" class="btn btn--outline btn--lg">View All Products</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== PROMO BANNERS ====================== -->
+{% if promo_banners %}
+<section class="section" aria-label="Promotions">
+  <div class="container">
+    <div class="promo-grid">
+      {% for banner in promo_banners %}
+      <div class="promo-card" style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
+        {% if banner.image %}
+          <img class="promo-card__img" src="{{ banner.image.url }}" alt="{{ banner.title }}" loading="lazy" />
+        {% endif %}
+        <div class="promo-card__content">
+          {% if banner.subtitle %}
+            <div class="promo-card__eyebrow">{{ banner.subtitle }}</div>
+          {% endif %}
+          <h3 class="promo-card__title">{{ banner.title }}</h3>
+          {% if banner.description %}
+            <p class="promo-card__desc">{{ banner.description }}</p>
+          {% endif %}
+          {% if banner.cta_text and banner.cta_link %}
+            <a href="{{ banner.cta_link }}" class="btn btn--primary">{{ banner.cta_text }}</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== NEW ARRIVALS ====================== -->
+{% if new_arrivals %}
+<section class="section section--lg" aria-labelledby="new-arrivals-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-header__eyebrow">Just Dropped</div>
+      <h2 class="section-header__title" id="new-arrivals-heading">New Arrivals</h2>
+      <p class="section-header__subtitle">The latest additions to the Luminex collection.</p>
+    </div>
+    <div class="product-grid">
+      {% for product in new_arrivals %}
+        {% include 'store/partials/product_card.html' with product=product %}
+      {% endfor %}
+    </div>
+    <div class="section-footer">
+      <a href="{% url 'store:product_list' %}?sort=-created_at" class="btn btn--dark btn--lg">See All New Arrivals</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== NO CONTENT FALLBACK ====================== -->
+{% if not featured_products and not new_arrivals and not categories %}
+<section class="section section--lg">
+  <div class="container">
+    <div class="empty-state">
+      <svg class="empty-state__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <h2 class="empty-state__title">Store coming soon</h2>
+      <p class="empty-state__text">Add products and banners from the admin dashboard to get started.</p>
+      <a href="/admin/" class="btn btn--primary btn--lg">Go to Admin</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ====================== VALUE PROPS ====================== -->
+<section class="section section--sm" style="background: var(--color-charcoal); color: white;">
+  <div class="container">
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align:center;">
+      {% with props="Free Shipping,Easy Returns,2-Year Warranty,24/7 Support" %}
+      {% with icons="🚚,↩️,🛡️,💬" %}
+      {% with descs="On orders over ₹5,000,30-day hassle-free returns,On all Luminex products,Expert help anytime" %}
+
+      <div style="padding: 1.5rem;">
+        <div style="font-size:2rem; margin-bottom:0.75rem;">🚚</div>
+        <div style="font-weight:700; font-size:1rem; margin-bottom:0.5rem; letter-spacing:-0.01em;">Free Shipping</div>
+        <div style="font-size:0.875rem; color:rgba(255,255,255,0.55);">On orders over ₹5,000</div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="font-size:2rem; margin-bottom:0.75rem;">↩️</div>
+        <div style="font-weight:700; font-size:1rem; margin-bottom:0.5rem; letter-spacing:-0.01em;">Easy Returns</div>
+        <div style="font-size:0.875rem; color:rgba(255,255,255,0.55);">30-day hassle-free returns</div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="font-size:2rem; margin-bottom:0.75rem;">🛡️</div>
+        <div style="font-weight:700; font-size:1rem; margin-bottom:0.5rem; letter-spacing:-0.01em;">2-Year Warranty</div>
+        <div style="font-size:0.875rem; color:rgba(255,255,255,0.55);">On all Luminex products</div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="font-size:2rem; margin-bottom:0.75rem;">💬</div>
+        <div style="font-weight:700; font-size:1rem; margin-bottom:0.5rem; letter-spacing:-0.01em;">24/7 Support</div>
+        <div style="font-size:0.875rem; color:rgba(255,255,255,0.55);">Expert help anytime</div>
+      </div>
+
+      {% endwith %}{% endwith %}{% endwith %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

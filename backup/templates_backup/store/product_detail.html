@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="product-detail">
+  <div class="container--narrow">
+
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="{% url 'store:home' %}" class="breadcrumbs__link">Home</a>
+      <span class="breadcrumbs__sep">›</span>
+      <a href="{% url 'store:product_list' %}" class="breadcrumbs__link">Products</a>
+      <span class="breadcrumbs__sep">›</span>
+      {% if product.category %}
+        <a href="{% url 'store:category_detail' product.category.slug %}" class="breadcrumbs__link">{{ product.category.name }}</a>
+        <span class="breadcrumbs__sep">›</span>
+      {% endif %}
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <!-- Product Grid -->
+    <div class="product-detail__grid">
+
+      <!-- Gallery -->
+      <div class="product-gallery">
+        <div class="product-gallery__main">
+          {% if product.main_image %}
+            <img
+              class="product-gallery__main-img"
+              id="main-gallery-img"
+              src="{{ product.main_image.url }}"
+              alt="{{ product.name }}"
+            />
+          {% else %}
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--color-light-grey);">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Thumbnails -->
+        {% if gallery or product.main_image %}
+        <div class="product-gallery__thumbs">
+          {% if product.main_image %}
+            <div class="product-gallery__thumb is-active" data-src="{{ product.main_image.url }}">
+              <img class="product-gallery__thumb-img" src="{{ product.main_image.url }}" alt="{{ product.name }} main" />
+            </div>
+          {% endif %}
+          {% for img in gallery %}
+            <div class="product-gallery__thumb" data-src="{{ img.image.url }}">
+              <img class="product-gallery__thumb-img" src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" />
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        {% if product.category %}
+          <div class="product-info__category">{{ product.category.name }}</div>
+        {% endif %}
+
+        <h1 class="product-info__name">{{ product.name }}</h1>
+
+        <div class="product-info__pricing">
+          <span class="product-info__price">{{ product.formatted_price }}</span>
+          {% if product.original_price %}
+            <span class="product-info__original-price">{{ product.formatted_original_price }}</span>
+            {% if product.discount_percent %}
+              <span class="product-info__discount">Save {{ product.discount_percent }}%</span>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <hr class="product-info__divider" />
+
+        {% if product.short_description %}
+          <p class="product-info__short-desc">{{ product.short_description }}</p>
+        {% endif %}
+
+        <!-- Stock -->
+        <div class="product-info__stock">
+          {% if product.in_stock %}
+            {% if product.stock <= 5 %}
+              <span class="stock-dot stock-dot--low"></span>
+              <span style="color:#ff9f0a; font-weight:600;">Only {{ product.stock }} left in stock</span>
+            {% else %}
+              <span class="stock-dot stock-dot--in"></span>
+              <span style="color:#30d158;">In Stock</span>
+            {% endif %}
+          {% else %}
+            <span class="stock-dot stock-dot--out"></span>
+            <span style="color:#ff3b30;">Out of Stock</span>
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="product-info__actions">
+          {% if product.in_stock %}
+            <a href="#" class="btn btn--primary btn--lg btn--full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              Add to Cart
+            </a>
+            <a href="#" class="btn btn--ghost btn--lg btn--full">Buy Now</a>
+          {% else %}
+            <button class="btn btn--ghost btn--lg btn--full" disabled style="opacity:0.5; cursor:not-allowed;">Out of Stock</button>
+            <a href="#" class="btn btn--outline btn--lg btn--full">Notify Me</a>
+          {% endif %}
+        </div>
+
+        <hr class="product-info__divider" />
+
+        <!-- Description -->
+        <div class="product-info__description">
+          {{ product.description|linebreaks }}
+        </div>
+
+        <!-- SKU -->
+        <p class="product-info__sku">SKU: {{ product.sku }}</p>
+
+        <!-- Tags -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1.5rem;">
+          {% if product.is_featured %}
+            <span class="badge badge--featured">Featured</span>
+          {% endif %}
+          {% if product.is_new_arrival %}
+            <span class="badge badge--new">New Arrival</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <section style="margin-top: 5rem;" aria-labelledby="related-heading">
+      <div class="section-header" style="text-align:left; margin-bottom:2rem;">
+        <div class="section-header__eyebrow">More Like This</div>
+        <h2 class="section-header__title" id="related-heading" style="font-size:2rem;">You May Also Like</h2>
+      </div>
+      <div class="product-grid">
+        {% for prod in related_products %}
+          {% include 'store/partials/product_card.html' with product=prod %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
