@@ -2308,23 +2308,26 @@ input, textarea, select { font-family: inherit; }
 .apple-card__image-box {
   flex: 1;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   min-height: 250px;
   position: relative;
-  margin-top: auto;
+  margin-top: 1rem;
+  padding: 1rem 0;
 }
 
 .apple-card__img {
-  max-height: 250px;
-  max-width: 95%;
+  max-height: 230px;
+  max-width: 88%;
+  width: auto;
+  height: auto;
   object-fit: contain;
-  mix-blend-mode: multiply;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.12));
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .apple-card:hover .apple-card__img {
-  transform: scale(1.05);
+  transform: scale(1.05) translateY(-3px);
 }
 
 /* Editorial / Difference Cards */
@@ -2388,16 +2391,14 @@ input, textarea, select { font-family: inherit; }
 
 .diff-card__graphic img {
   border-radius: 16px;
-  max-width: 100%;
+  max-width: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.08));
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.diff-card:not([style*="linear-gradient"]):not([style*="background:#0d0d12"]) .diff-card__graphic img {
-  mix-blend-mode: multiply;
-}
-
 .diff-card:hover .diff-card__graphic img {
-  transform: scale(1.04);
+  transform: scale(1.05) translateY(-3px);
 }
 
 /* --- Apple Store Bag / Cart Page --- */
