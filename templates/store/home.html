@@ -8,46 +8,63 @@
   <div class="container">
     <div class="store-header__inner">
 
-      <!-- Title Area -->
-      <div class="store-header__title-area">
+      <!-- Left: Big Store Title -->
+      <div class="store-header__left">
         <h1 class="store-header__h1" id="store-heading">
-          <span class="store-header__gradient">Store.</span>
-          <span class="store-header__subtext">The best way to buy the products you love.</span>
+          <span class="store-header__gradient">Store</span>
         </h1>
       </div>
 
-      <!-- Concierge & Support Links -->
-      <div class="store-header__concierge">
-        <div class="store-header__concierge-item">
-          <span>Need shopping help?</span>
-          <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
-            Ask a Specialist &#x2197;
-          </a>
+      <!-- Center: Festive Mandala Motif with Ambient Halo -->
+      <div class="store-header__center">
+        <div class="store-header__mandala-wrap">
+          <img
+            class="store-header__mandala-img"
+            src="{% static 'images/brand/mandala_accent.svg' %}"
+            alt="Luminex Festive Celebration"
+          />
         </div>
-        <div class="store-header__concierge-item">
-          <span>Visit a Luminex Store</span>
-          <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
-            Find a store near you &#x2197;
-          </a>
+      </div>
+
+      <!-- Right: Subtitle & Support Links -->
+      <div class="store-header__right">
+        <div class="store-header__tagline">
+          Spread joy with the<br>products you love.
+        </div>
+        <div class="store-header__concierge">
+          <div class="store-header__concierge-item">
+            <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
+              Connect with a Specialist &#x2197;
+            </a>
+          </div>
+          <div class="store-header__concierge-item">
+            <a href="{% url 'store:product_list' %}" class="store-header__concierge-link">
+              Find a Luminex Store &#x2197;
+            </a>
+          </div>
         </div>
       </div>
 
     </div>
-
-    <!-- Festive Mandala Watermark Graphic (Apple India Festive Campaign inspired) -->
-    <img
-      class="store-header__mandala-bg"
-      src="{% static 'images/brand/mandala_accent.svg' %}"
-      alt=""
-      aria-hidden="true"
-    />
 
     <!-- ====================== HORIZONTAL CATEGORY ICON STRIP ====================== -->
     <nav class="category-strip" aria-label="Product categories">
       {% for cat in categories %}
       <a href="{% url 'store:category_detail' cat.slug %}" class="category-strip__item">
         <div class="category-strip__icon-box">
-          {% if cat.image %}
+          {% if cat.slug == 'smartphones' %}
+            <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.slug == 'laptops' %}
+            <img src="{% static 'images/products/luminex_book_pro_16.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.slug == 'audio' %}
+            <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.slug == 'wearables' %}
+            <img src="{% static 'images/products/luminex_watch_ultra_2.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.slug == 'tablets' %}
+            <img src="{% static 'images/products/luminex_pad_pro_13.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.slug == 'accessories' %}
+            <img src="{% static 'images/products/luminex_magcharge.svg' %}" alt="{{ cat.name }}" />
+          {% elif cat.image %}
             <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy" />
           {% else %}
             <img src="{% static 'images/categories/cat_'|add:cat.slug|add:'.svg' %}" alt="{{ cat.name }}" onerror="this.src='{% static 'images/categories/cat_smartphones.svg' %}'" />
@@ -62,7 +79,7 @@
 </header>
 
 
-<!-- ====================== "THE LATEST" PRODUCT CAROUSEL ====================== -->
+<!-- ====================== 1. "THE LATEST" PRODUCT CAROUSEL ====================== -->
 <section class="apple-carousel-section" aria-labelledby="latest-heading">
   <div class="container">
 
@@ -104,6 +121,14 @@
           {% endif %}
         </div>
 
+        <!-- Color Finishes Swatches -->
+        <div class="apple-card__swatches" aria-hidden="true">
+          <span class="apple-card__swatch" style="background-color: #2b2b2e;" title="Space Black"></span>
+          <span class="apple-card__swatch" style="background-color: #9d9489;" title="Natural Titanium"></span>
+          <span class="apple-card__swatch" style="background-color: #e3e4e6;" title="Silver"></span>
+          <span class="apple-card__swatch" style="background-color: #c5a059;" title="Gold Desert"></span>
+        </div>
+
         <div class="apple-card__image-box">
           {% if product.main_image %}
             <img class="apple-card__img" src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" />
@@ -119,7 +144,7 @@
 </section>
 
 
-<!-- ====================== "THE LUMINEX DIFFERENCE" EDITORIAL CAROUSEL ====================== -->
+<!-- ====================== 2. "THE LUMINEX DIFFERENCE" EDITORIAL CAROUSEL ====================== -->
 <section class="apple-carousel-section" style="background-color: var(--color-white);" aria-labelledby="diff-heading">
   <div class="container">
 
@@ -139,107 +164,382 @@
     <div class="apple-carousel__track" role="region" aria-label="Luminex difference cards">
 
       <!-- Card 1: Festive EMI & Cashback -->
-      <div class="diff-card">
+      <a href="{% url 'store:product_list' %}" class="diff-card" aria-label="Festive EMI and Cashback">
         <div class="diff-card__eyebrow">FESTIVE OFFER</div>
-        <h3 class="diff-card__title">Get up to 12 months of No Cost EMI this season.</h3>
-        <p class="diff-card__desc">Plus up to ₹10,000.00 instant cashback on selected products with eligible cards.</p>
+        <h3 class="diff-card__title">Get up to 12 months of No Cost EMI&#9674; this season.</h3>
+        <p class="diff-card__desc">Plus up to &#8377;10,000.00 instant cashback&#916; on selected products with eligible cards.</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/brand/mandala_accent.svg' %}" alt="" style="max-height:180px; object-fit:contain;" />
+          <img src="{% static 'images/brand/mandala_accent.svg' %}" alt="Festive offer" style="max-height:180px; object-fit:contain;" />
         </div>
-      </div>
+      </a>
 
-      <!-- Card 2: Trade In -->
-      <div class="diff-card">
+      <!-- Card 2: Limited Edition Special Buds -->
+      <a href="{% url 'store:product_detail' 'luminex-buds-pro-3' %}" class="diff-card" aria-label="Special Edition Luminex Buds Pro">
+        <div class="diff-card__eyebrow">ONLY AT LUMINEX</div>
+        <h3 class="diff-card__title">Limited edition. Unlimited joy.</h3>
+        <p class="diff-card__desc">Special Edition Luminex Buds Pro with Wireless Charging Case featuring festive laser engraving.&#8224;</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/special_buds_engraving.svg' %}" alt="Engraved buds" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Card 3: Free Engraving -->
+      <a href="{% url 'store:category_detail' 'audio' %}" class="diff-card" aria-label="Free Engraving on Devices">
+        <div class="diff-card__eyebrow">FREE ENGRAVING</div>
+        <h3 class="diff-card__title">Add a festive touch to devices.</h3>
+        <p class="diff-card__desc">Customise your new Buds or Pad with names, initials, or festive emojis in regional Indian languages.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/education_hero.svg' %}" alt="Personal engraving" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Card 4: Trade In -->
+      <a href="{% url 'store:category_detail' 'smartphones' %}" class="diff-card" aria-label="Luminex Trade In">
         <div class="diff-card__eyebrow">LUMINEX TRADE IN</div>
         <h3 class="diff-card__title">Exchange your device. Upgrade and save.</h3>
-        <p class="diff-card__desc">Get instant credit toward a brand new Luminex device when you exchange your old smartphone or laptop.</p>
+        <p class="diff-card__desc">Get instant credit toward a brand new Luminex device when you exchange your old smartphone or laptop.&#8225;</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_air_15.svg' %}" alt="" style="max-height:160px; object-fit:contain;" />
+          <img src="{% static 'images/products/luminex_air_15.svg' %}" alt="Trade in" style="max-height:160px; object-fit:contain;" />
         </div>
-      </div>
+      </a>
 
-      <!-- Card 3: Free Delivery & Returns -->
-      <div class="diff-card">
+      <!-- Card 5: Free Delivery -->
+      <a href="{% url 'store:product_list' %}" class="diff-card" aria-label="Fast Free Delivery and Returns">
         <div class="diff-card__eyebrow">FREE DELIVERY</div>
         <h3 class="diff-card__title">Fast, free delivery straight to your door.</h3>
-        <p class="diff-card__desc">Enjoy contactless delivery on all orders, plus hassle-free 30-day returns on any purchase.</p>
+        <p class="diff-card__desc">Enjoy contactless delivery on all orders across India, plus hassle-free 14-day returns on any purchase.</p>
         <div class="diff-card__graphic">
-          <div style="font-size:4.5rem; text-align:center;">🚚</div>
+          <img src="{% static 'images/editorial/delivery_box.svg' %}" alt="Contactless Delivery" style="max-height:160px; object-fit:contain;" />
         </div>
-      </div>
+      </a>
 
-      <!-- Card 4: Personalised Setup -->
-      <div class="diff-card">
-        <div class="diff-card__eyebrow">ONLINE & IN-STORE</div>
-        <h3 class="diff-card__title">Personalised setup with a Specialist.</h3>
-        <p class="diff-card__desc">Our experts will walk you through data transfer, feature walkthroughs, and custom device configuration.</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== 3. "JOY STARTS HERE" EDITORIAL CAROUSEL ====================== -->
+<section class="apple-carousel-section" aria-labelledby="joy-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="joy-heading">
+        <span class="apple-carousel__title-gradient">Joy starts here.</span>
+        <span class="apple-carousel__title-muted">Make it a season to remember.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Joy carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous joy offers">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next joy offers">&#x203A;</button>
+      </div>
+    </div>
+
+    <div class="apple-carousel__track" role="region" aria-label="Joy cards">
+
+      <!-- Joy Card 1: Festive Wallpaper Rangoli -->
+      <a href="{% url 'store:category_detail' 'tablets' %}" class="diff-card" style="background:#fff;" aria-label="Festive Wallpaper">
+        <div class="diff-card__eyebrow" style="color:#d61f69;">FESTIVE WALLPAPER</div>
+        <h3 class="diff-card__title">Display your creativity.</h3>
+        <p class="diff-card__desc">Create, download and share your own digital rangoli wallpaper designed especially for the season.</p>
         <div class="diff-card__graphic">
-          <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="" style="max-height:150px; object-fit:contain;" />
+          <img src="{% static 'images/editorial/rangoli_app.svg' %}" alt="Rangoli app" style="max-height:180px; object-fit:contain;" />
         </div>
-      </div>
+      </a>
 
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ====================== DYNAMIC HERO PROMOTIONS ====================== -->
-{% if hero_banners %}
-<section class="section" style="padding: 2rem 0 4rem;" aria-label="Dynamic featured promotions">
-  <div class="container">
-    <div class="section-header" style="text-align:left; margin-bottom: 1.5rem;">
-      <div class="section-header__eyebrow">Special Editions</div>
-      <h2 class="section-header__title" style="font-size:2rem;">Designed to Inspire</h2>
-    </div>
-
-    <div class="promo-grid">
-      {% for banner in hero_banners %}
-      <div class="promo-card" style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
-        {% if banner.image %}
-          <img class="promo-card__img" src="{{ banner.image.url }}" alt="{{ banner.title }}" loading="lazy" />
-        {% endif %}
-        <div class="promo-card__content">
-          {% if banner.subtitle %}
-            <div class="promo-card__eyebrow">{{ banner.subtitle }}</div>
-          {% endif %}
-          <h3 class="promo-card__title">{{ banner.title }}</h3>
-          {% if banner.description %}
-            <p class="promo-card__desc">{{ banner.description }}</p>
-          {% endif %}
-          {% if banner.cta_text and banner.cta_link %}
-            <a href="{{ banner.cta_link }}" class="btn btn--primary">{{ banner.cta_text }}</a>
-          {% endif %}
+      <!-- Joy Card 2: Workshop: Draw Rangoli on Pad -->
+      <a href="{% url 'store:product_detail' 'luminex-pad-pro-13' %}" class="diff-card" style="background:#fff;" aria-label="Today at Luminex Workshop">
+        <div class="diff-card__eyebrow" style="color:#d61f69;">TODAY AT LUMINEX</div>
+        <h3 class="diff-card__title">Workshop: Draw Your Own Rangoli on Pad</h3>
+        <p class="diff-card__desc">Join a free in-store session and create a festive rangoli design to share using the Luminex Stylus.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/today_workshop.svg' %}" alt="Today workshop" style="max-height:180px; object-fit:contain;" />
         </div>
-      </div>
-      {% endfor %}
+      </a>
+
+      <!-- Joy Card 3: Luminex Store App -->
+      <a href="{% url 'store:product_list' %}" class="diff-card" style="background:#fff;" aria-label="Luminex Store App">
+        <div class="diff-card__eyebrow" style="color:#d61f69;">LUMINEX STORE APP</div>
+        <h3 class="diff-card__title">Let them know joy is on the way.</h3>
+        <p class="diff-card__desc">Send a personalized digital greeting card with celebratory unboxing animations that's fun to receive.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/festive_music.svg' %}" alt="Digital greeting" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
     </div>
+
   </div>
 </section>
-{% endif %}
 
 
-<!-- ====================== NEW ARRIVALS GRID ====================== -->
-{% if new_arrivals %}
-<section class="section section--lg" style="background: var(--color-off-white);" aria-labelledby="new-arrivals-heading">
+<!-- ====================== 4. "TUNE IN TO JOY" AUDIO SHOWCASE ====================== -->
+<section class="apple-carousel-section" style="background-color: var(--color-white);" aria-labelledby="sound-heading">
   <div class="container">
-    <div class="section-header">
-      <div class="section-header__eyebrow">Explore the Lineup</div>
-      <h2 class="section-header__title" id="new-arrivals-heading">All New Additions</h2>
-      <p class="section-header__subtitle">Explore precision engineering and stunning industrial design.</p>
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="sound-heading">
+        <span class="apple-carousel__title-gradient">Tune in to joy.</span>
+        <span class="apple-carousel__title-muted">Discover a world of great sound.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Audio carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous audio items">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next audio items">&#x203A;</button>
+      </div>
     </div>
 
-    <div class="product-grid">
-      {% for product in new_arrivals %}
-        {% include 'store/partials/product_card.html' with product=product %}
-      {% endfor %}
+    <div class="apple-carousel__track" role="region" aria-label="Audio showcase cards">
+
+      <!-- Sound Card 1: 3 Months Free Music Promo -->
+      <a href="{% url 'store:category_detail' 'audio' %}" class="diff-card" style="background: linear-gradient(145deg, #2b0b21 0%, #4a0e2e 100%); color: #fff;" aria-label="Luminex Music Subscription">
+        <div class="diff-card__eyebrow" style="color:#ff758c;">MUSIC SUBSCRIPTION</div>
+        <h3 class="diff-card__title" style="color:#fff;">Get 3 months of Luminex Music free.</h3>
+        <p class="diff-card__desc" style="color:rgba(255,255,255,0.8);">Included with the purchase of selected Luminex audio and smartphone devices.*</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/festive_music.svg' %}" alt="Luminex Music Hindi Pop" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Sound Card 2: Special Edition Buds -->
+      <a href="{% url 'store:product_detail' 'luminex-buds-pro-3' %}" class="diff-card" style="background:#fbfbfd;" aria-label="Special Edition Luminex Buds Pro 3">
+        <div class="diff-card__eyebrow" style="color:#d61f69;">ONLY AT LUMINEX</div>
+        <h3 class="diff-card__title">Special Edition Luminex Buds Pro 3</h3>
+        <p class="diff-card__desc">Wireless Charging Case with limited edition laser engraving motif.&#8224;</p>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;24,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/special_buds_engraving.svg' %}" alt="Special Buds" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Sound Card 3: Phones Max Over-Ear -->
+      <a href="{% url 'store:product_detail' 'luminex-phones-max' %}" class="diff-card" style="background:#fbfbfd;" aria-label="Luminex Phones Max Sunset Amber">
+        <div class="diff-card__eyebrow">PREMIUM ACOUSTICS</div>
+        <h3 class="diff-card__title">Luminex Phones Max &ndash; Sunset Amber</h3>
+        <div class="apple-card__swatches" style="margin-bottom:0.75rem;">
+          <span class="apple-card__swatch" style="background-color: #e07a5f;" title="Sunset Amber"></span>
+          <span class="apple-card__swatch" style="background-color: #457b9d;" title="Sky Blue"></span>
+          <span class="apple-card__swatch" style="background-color: #1d1d1f;" title="Space Gray"></span>
+          <span class="apple-card__swatch" style="background-color: #f1faee;" title="Silver"></span>
+        </div>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;59,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_phones_max.svg' %}" alt="Phones Max" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Sound Card 4: Buds Pro 3 -->
+      <a href="{% url 'store:product_detail' 'luminex-buds-pro-3' %}" class="diff-card" style="background:#fbfbfd;" aria-label="Luminex Buds Pro 3 Titanium Case">
+        <div class="diff-card__eyebrow">PRO AUDIO</div>
+        <h3 class="diff-card__title">Luminex Buds Pro 3 &ndash; Titanium Case</h3>
+        <p class="diff-card__desc">Adaptive Audio, Active Noise Cancellation, and Transparency mode.</p>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;24,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_buds_pro_3.svg' %}" alt="Buds Pro 3" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
     </div>
 
-    <div class="section-footer">
-      <a href="{% url 'store:product_list' %}" class="btn btn--dark btn--lg">View Entire Catalog</a>
+  </div>
+</section>
+
+
+<!-- ====================== 5. "ACCESSORIES" SHOWCASE ====================== -->
+<section class="apple-carousel-section" aria-labelledby="accessories-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="accessories-heading">
+        <span class="apple-carousel__title-gradient">Accessories.</span>
+        <span class="apple-carousel__title-muted">Get more attached to your devices this season.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Accessories carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous accessories">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next accessories">&#x203A;</button>
+      </div>
+    </div>
+
+    <div class="apple-carousel__track" role="region" aria-label="Accessories showcase cards">
+
+      <!-- Editorial Card: Perfectly Paired Gifts -->
+      <a href="{% url 'store:category_detail' 'accessories' %}" class="diff-card" style="background:#fff;" aria-label="Perfectly paired gifts">
+        <div class="diff-card__eyebrow">CURATED ENSEMBLE</div>
+        <h3 class="diff-card__title">Perfectly paired gifts.</h3>
+        <p class="diff-card__desc">Explore accessories in new colours, styles and textures you'll love this festive celebration.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/accessories_paired.svg' %}" alt="Paired accessories" style="max-height:180px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Accessory Card 2: Duo Case Sand -->
+      <a href="{% url 'store:product_detail' 'luminex-smart-folio' %}" class="diff-card" style="background:#fff;" aria-label="Luminex Duo Case Sand">
+        <div class="diff-card__eyebrow" style="color:#e07a5f;">NEW</div>
+        <h3 class="diff-card__title">Luminex Duo Case &ndash; Sand</h3>
+        <div class="apple-card__swatches" style="margin-bottom:0.75rem;">
+          <span class="apple-card__swatch" style="background-color: #d4c5b9;" title="Sand"></span>
+          <span class="apple-card__swatch" style="background-color: #3d3b38;" title="Midnight"></span>
+        </div>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;8,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/accessories_paired.svg' %}" alt="Duo Case Sand" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Accessory Card 3: Silicone Case Magenta -->
+      <a href="{% url 'store:category_detail' 'accessories' %}" class="diff-card" style="background:#fff;" aria-label="Luminex Pro Max Silicone Case Magenta">
+        <div class="diff-card__eyebrow" style="color:#d61f69;">NEW</div>
+        <h3 class="diff-card__title">Luminex Pro Max Silicone Case &ndash; Magenta</h3>
+        <div class="apple-card__swatches" style="margin-bottom:0.75rem;">
+          <span class="apple-card__swatch" style="background-color: #b5179e;" title="Magenta"></span>
+          <span class="apple-card__swatch" style="background-color: #f72585;" title="Fuchsia"></span>
+          <span class="apple-card__swatch" style="background-color: #4cc9f0;" title="Lake Blue"></span>
+          <span class="apple-card__swatch" style="background-color: #2b2b2e;" title="Midnight"></span>
+          <span class="apple-card__swatch" style="background-color: #e2e8f0;" title="Starlight"></span>
+        </div>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;4,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/case_magenta.svg' %}" alt="Silicone Case Magenta" style="max-height:170px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Accessory Card 4: MagCharge Fast Puck -->
+      <a href="{% url 'store:product_detail' 'luminex-magcharge-30w' %}" class="diff-card" style="background:#fff;" aria-label="MagCharge 30W Fast Charger">
+        <div class="diff-card__eyebrow">FAST CHARGING</div>
+        <h3 class="diff-card__title">MagCharge 30W Fast Charger</h3>
+        <p class="diff-card__desc">Snap-on magnetic alignment for maximum charging efficiency up to 30W.</p>
+        <div class="diff-card__price" style="font-size:0.875rem; color:#6e6e73; margin-bottom:1rem;">MRP &#8377;3,900.00 (Incl. of all taxes)</div>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_magcharge.svg' %}" alt="MagCharge" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== 6. "THE LUMINEX EXPERIENCE" CAROUSEL ====================== -->
+<section class="apple-carousel-section" style="background-color: var(--color-white);" aria-labelledby="experience-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="experience-heading">
+        <span class="apple-carousel__title-gradient">The Luminex experience.</span>
+        <span class="apple-carousel__title-muted">Do even more with Luminex products and services.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Experience carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous experience">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next experience">&#x203A;</button>
+      </div>
+    </div>
+
+    <div class="apple-carousel__track" role="region" aria-label="Experience showcase cards">
+
+      <!-- Experience Card 1: Luminex Intelligence -->
+      <a href="{% url 'store:product_detail' 'luminex-pro-15' %}" class="diff-card" style="background:#0d0d12; color:#fff;" aria-label="Luminex Intelligence and Aura AI">
+        <div class="diff-card__eyebrow" style="color:#00dfd8;">LUMINEX INTELLIGENCE</div>
+        <h3 class="diff-card__title" style="color:#fff;">Luminex Intelligence and Aura AI. More personal. More powerful.&sup2;</h3>
+        <p class="diff-card__desc" style="color:rgba(255,255,255,0.75);">AI deeply integrated across your devices to help you write, express, and get things done effortlessly.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/luminex_intelligence.svg' %}" alt="Luminex Intelligence" style="max-height:175px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Experience Card 2: Continuity -->
+      <a href="{% url 'store:product_detail' 'luminex-book-pro-16' %}" class="diff-card" style="background:#fbfbfd;" aria-label="Continuity Ecosystem">
+        <div class="diff-card__eyebrow">CONTINUITY</div>
+        <h3 class="diff-card__title">Powerful alone. Superpowered together.</h3>
+        <p class="diff-card__desc">Copy on your phone, paste on your laptop. Answer calls on your watch. Everything syncs effortlessly.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/continuity.svg' %}" alt="Ecosystem continuity" style="max-height:175px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Experience Card 3: Luminex Store App Personal Touch -->
+      <a href="{% url 'store:product_list' %}" class="diff-card" style="background:#fbfbfd;" aria-label="Luminex Store Personal Gifting">
+        <div class="diff-card__eyebrow">LUMINEX STORE APP</div>
+        <h3 class="diff-card__title">Put your bow on it.</h3>
+        <p class="diff-card__desc">Make the gift unmistakably theirs with a personal gift message and customized celebratory festive packaging.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/special_buds_engraving.svg' %}" alt="Gift card" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== 7. "SAVINGS AND OFFERS" CAROUSEL ====================== -->
+<section class="apple-carousel-section" aria-labelledby="savings-heading">
+  <div class="container">
+
+    <div class="apple-carousel__header">
+      <h2 class="apple-carousel__title" id="savings-heading">
+        <span class="apple-carousel__title-gradient">Savings and offers.</span>
+        <span class="apple-carousel__title-muted">Exclusive deals, special stores and more.</span>
+      </h2>
+
+      <div class="apple-carousel__controls" aria-label="Savings carousel controls">
+        <button class="apple-carousel__btn apple-carousel__btn--prev" aria-label="Previous savings">&#x2039;</button>
+        <button class="apple-carousel__btn apple-carousel__btn--next" aria-label="Next savings">&#x203A;</button>
+      </div>
+    </div>
+
+    <div class="apple-carousel__track" role="region" aria-label="Savings and special stores">
+
+      <!-- Savings Card 1: Education Pricing -->
+      <a href="{% url 'store:category_detail' 'laptops' %}" class="diff-card" style="background:#fff;" aria-label="Education Pricing">
+        <div class="diff-card__eyebrow">EDUCATION</div>
+        <h3 class="diff-card__title">Save on a new Book, Pad and Watch with education pricing.&infin;</h3>
+        <p class="diff-card__desc">Special savings available for currently enrolled university students, their parents, and faculty members.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/editorial/education_hero.svg' %}" alt="Education pricing" style="max-height:180px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Savings Card 2: Luminex at Work -->
+      <a href="{% url 'store:product_list' %}" class="diff-card" style="background:#fff;" aria-label="Business solutions">
+        <div class="diff-card__eyebrow">BUSINESS</div>
+        <h3 class="diff-card__title">From enterprise to small business, we'll work with you.</h3>
+        <p class="diff-card__desc">Dedicated business pricing, zero-touch deployment with Luminex Business Manager, and tax invoice support.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_book_pro_16.svg' %}" alt="Business solutions" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </a>
+
+      <!-- Savings Card 3: Trade In Exchange -->
+      <a href="{% url 'store:category_detail' 'smartphones' %}" class="diff-card" style="background:#fff;" aria-label="Luminex Trade In Exchange">
+        <div class="diff-card__eyebrow">TRADE IN</div>
+        <h3 class="diff-card__title">Exchange your smartphone. Get up to &#8377;67,500.00 credit.&#8225;</h3>
+        <p class="diff-card__desc">Trade in an eligible device for instant credit towards your new purchase, or recycle it responsibly for free.</p>
+        <div class="diff-card__graphic">
+          <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="Luminex Trade In" style="max-height:160px; object-fit:contain;" />
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ====================== 8. "QUICK LINKS" PILL BUTTONS ====================== -->
+<section class="apple-quick-links-section" aria-labelledby="quick-links-heading">
+  <div class="container">
+    <h2 class="apple-quick-links__title" id="quick-links-heading">Quick Links</h2>
+    <div class="apple-quick-links__pills">
+      <a href="{% url 'store:product_list' %}" class="apple-pill-btn">Find a Store</a>
+      <a href="{% url 'accounts:profile' %}" class="apple-pill-btn">Order Status</a>
+      <a href="{% url 'store:product_list' %}" class="apple-pill-btn">Shopping Help</a>
+      <a href="{% url 'accounts:profile' %}" class="apple-pill-btn">Your Saves</a>
     </div>
   </div>
 </section>
-{% endif %}
 
 {% endblock %}

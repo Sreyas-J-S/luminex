@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" width="320" height="400">
+  <defs>
+    <radialGradient id="magGrad" cx="30%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#d61f69"/>
+      <stop offset="60%" stop-color="#99154b"/>
+      <stop offset="100%" stop-color="#6b0e34"/>
+    </radialGradient>
+    <filter id="caseShadow" x="-20%" y="-15%" width="140%" height="135%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(60, 30)" filter="url(#caseShadow)">
+    <!-- Case silhouette -->
+    <rect x="0" y="0" width="200" height="340" rx="38" fill="url(#magGrad)"/>
+    
+    <!-- Camera Plateau -->
+    <rect x="18" y="18" width="90" height="90" rx="24" fill="#6b0e34"/>
+    <circle cx="42" cy="42" r="18" fill="#2d0615"/>
+    <circle cx="42" cy="84" r="18" fill="#2d0615"/>
+    <circle cx="84" cy="63" r="16" fill="#2d0615"/>
+    <!-- LiDAR sensor & flash -->
+    <circle cx="84" cy="30" r="5" fill="#fef08a"/>
+    <circle cx="84" cy="94" r="5" fill="#111"/>
+
+    <!-- Subtle Luminex Embossed Logo -->
+    <circle cx="100" cy="180" r="16" fill="#7d123d"/>
+
+    <!-- MagCharge indicator subtle ring -->
+    <circle cx="100" cy="180" r="44" fill="none" stroke="#7d123d" stroke-width="2.5" stroke-dasharray="8,6"/>
+  </g>
+</svg>

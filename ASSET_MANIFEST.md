@@ -50,5 +50,22 @@ In accordance with fair usage and intellectual property compliance:
 
 ---
 
+## 3b. Editorial & Campaign Graphics
+
+| Asset Name | Relative Path | Format | ViewBox / Dims | License Status | Intended Use |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Festive Music Banner | `editorial/festive_music.svg` | SVG | 400 × 400 | Proprietary (Original Luminex Asset) | Audio & Music promo card |
+| Special Edition Engraved Buds | `editorial/special_buds_engraving.svg` | SVG | 400 × 360 | Proprietary (Original Luminex Asset) | Free Festive Engraving editorial card |
+| Rangoli App on Device | `editorial/rangoli_app.svg` | SVG | 360 × 420 | Proprietary (Original Luminex Asset) | "Display your creativity" editorial card |
+| Accessories Ensemble | `editorial/accessories_paired.svg` | SVG | 440 × 380 | Proprietary (Original Luminex Asset) | Accessories showcase card |
+| Magenta Case Detail | `editorial/case_magenta.svg` | SVG | 320 × 400 | Proprietary (Original Luminex Asset) | Accessories case card with color swatches |
+| Luminex Intelligence Glow | `editorial/luminex_intelligence.svg` | SVG | 500 × 360 | Proprietary (Original Luminex Asset) | AI & Aura Intelligence feature card |
+| Continuity Ecosystem | `editorial/continuity.svg` | SVG | 520 × 360 | Proprietary (Original Luminex Asset) | Multi-device continuity feature card |
+| Education Campus Bundle | `editorial/education_hero.svg` | SVG | 520 × 360 | Proprietary (Original Luminex Asset) | Education pricing savings card |
+| Today at Luminex Workshop | `editorial/today_workshop.svg` | SVG | 440 × 340 | Proprietary (Original Luminex Asset) | Today at Luminex workshops card |
+| Contactless Delivery Box | `editorial/delivery_box.svg` | SVG | 320 × 240 | Proprietary (Original Luminex Asset) | Free Delivery & Returns editorial card |
+
+---
+
 ## 4. Central Product Image Mapping
 Central mapping is defined in `store/management/commands/attach_assets.py` and stored in the Django database fields (`Product.main_image` and `Category.image`), allowing database-driven changes without altering HTML templates.

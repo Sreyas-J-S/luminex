@@ -64,15 +64,65 @@
           </form>
         </div>
 
-        <!-- Shopping Bag Icon with Dynamic Badge -->
-        <a href="{% url 'store:cart_detail' %}" class="navbar__bag" aria-label="Review your Shopping Bag">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-          {% if cart_item_count and cart_item_count > 0 %}
-            <span class="navbar__bag-badge">{{ cart_item_count }}</span>
-          {% endif %}
-        </a>
+        <!-- Shopping Bag with Interactive Flyout Dropdown -->
+        <div class="navbar__bag-wrapper">
+          <a href="{% url 'store:cart_detail' %}" class="navbar__bag" id="bag-button" aria-label="Review your Shopping Bag" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            {% if cart_item_count and cart_item_count > 0 %}
+              <span class="navbar__bag-badge">{{ cart_item_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- Bag Flyout Popover -->
+          <div class="navbar__bag-dropdown" id="bag-dropdown" role="menu" aria-label="Shopping bag flyout">
+            {% if cart and cart.items.all %}
+              <div class="bag-dropdown__header">
+                <span class="bag-dropdown__title">Your Bag</span>
+                <span class="bag-dropdown__count">{{ cart.total_items }} item{{ cart.total_items|pluralize }}</span>
+              </div>
+              <div class="bag-dropdown__items">
+                {% for item in cart.items.all %}
+                <div class="bag-dropdown__item">
+                  <div class="bag-dropdown__thumb">
+                    {% if item.product.main_image %}
+                      <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
+                    {% else %}
+                      <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ item.product.name }}">
+                    {% endif %}
+                  </div>
+                  <div class="bag-dropdown__details">
+                    <a href="{{ item.product.get_absolute_url }}" class="bag-dropdown__item-title">{{ item.product.name }}</a>
+                    <div class="bag-dropdown__item-meta">Qty: {{ item.quantity }} &middot; {{ item.formatted_subtotal }}</div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="bag-dropdown__footer">
+                <div class="bag-dropdown__subtotal">
+                  <span>Total:</span>
+                  <strong>{{ cart.formatted_total_price }}</strong>
+                </div>
+                <div class="bag-dropdown__actions">
+                  <a href="{% url 'store:cart_detail' %}" class="btn btn--outline btn--sm" style="flex:1; text-align:center;">Review Bag</a>
+                  <a href="{% url 'store:checkout' %}" class="btn btn--primary btn--sm" style="flex:1; text-align:center;">Check Out</a>
+                </div>
+              </div>
+            {% else %}
+              <div class="bag-dropdown__empty">
+                <p class="bag-dropdown__empty-text">Your Bag is empty.</p>
+                <div class="bag-dropdown__links">
+                  <a href="{% url 'accounts:profile' %}" class="bag-dropdown__link">Profile &amp; Orders &rsaquo;</a>
+                  <a href="{% url 'store:product_list' %}" class="bag-dropdown__link">Shop Latest Devices &rsaquo;</a>
+                  {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:login' %}" class="bag-dropdown__link">Sign In &rsaquo;</a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
 
         <!-- Auth links -->
         {% if user.is_authenticated %}
@@ -95,13 +145,13 @@
 
   <!-- ====================== ANNOUNCEMENT RIBBON ====================== -->
   <aside class="announcement-ribbon" aria-label="Promotional announcements">
-    Get up to 12 months of No Cost EMI plus up to ₹10,000.00 instant cashback on selected products with eligible cards.
+    Get up to 12 months of No Cost EMI&#9674; plus up to &#8377;10,000.00 instant cashback&#916; on selected products with eligible cards.
     <a href="{% url 'store:product_list' %}" class="announcement-ribbon__link">See offers &rsaquo;</a>
   </aside>
 
   <!-- ====================== MOBILE NAV ====================== -->
   <div class="navbar__mobile-overlay" id="mobile-nav" role="dialog" aria-label="Mobile navigation">
-    <button class="navbar__mobile-close" aria-label="Close menu">✕</button>
+    <button class="navbar__mobile-close" aria-label="Close menu">&#x2715;</button>
     <a href="{% url 'store:home' %}" class="navbar__mobile-link">Store</a>
     <a href="{% url 'store:product_list' %}" class="navbar__mobile-link">All Products</a>
     {% for cat in nav_categories %}
@@ -119,14 +169,13 @@
     {% endif %}
   </div>
 
-
   <!-- ====================== MESSAGES ====================== -->
   {% if messages %}
     <div class="messages-container" role="alert" aria-live="polite">
       {% for message in messages %}
         <div class="alert alert--{{ message.tags }}">
           <span>{{ message }}</span>
-          <button class="alert__close" aria-label="Dismiss">✕</button>
+          <button class="alert__close" aria-label="Dismiss">&#x2715;</button>
         </div>
       {% endfor %}
     </div>
@@ -137,66 +186,215 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- ====================== FOOTER ====================== -->
-  <footer class="footer" role="contentinfo">
+  <!-- ====================== AUTHENTIC APPLE INDIA DIRECTORY FOOTER ====================== -->
+  <footer class="apple-footer" role="contentinfo">
     <div class="container">
-      <div class="footer__grid">
 
-        <!-- Brand -->
-        <div>
-          <div class="footer__brand">Luminex</div>
-          <p class="footer__tagline">Premium electronics and tech products, curated for those who demand excellence. Illuminate your world.</p>
-          <div class="footer__social">
-            <a href="#" class="footer__social-link" aria-label="Twitter">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629Zm-1.161 17.52h1.833L7.084 4.126H5.117Z"/></svg>
-            </a>
-            <a href="#" class="footer__social-link" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-            <a href="#" class="footer__social-link" aria-label="YouTube">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            </a>
+      <!-- Footnotes & Disclaimers Section -->
+      <section class="apple-footer__disclaimers" aria-label="Legal footnotes and disclaimers">
+        <ol class="apple-footer__footnotes">
+          <li>
+            <span class="footnote-sym">&#9674;</span>
+            From 11 October 2026 through 11 November 2026, No Cost EMI is available with the purchase of an eligible product made using qualifying cards on 3-, 6-, 9- and 12-month tenures from most leading card issuers. Minimum order spend applies as per card issuer terms. Offer may be revised or withdrawn at any time without prior notice.
+          </li>
+          <li>
+            <span class="footnote-sym">&#916;</span>
+            Instant cashback is available with the purchase of an eligible product with qualifying American Express, Axis Bank and ICICI Bank cards only. Minimum transaction value of &#8377;10,001.00 applies. Instant cashback is available for up to two orders per rolling 90-day period.
+          </li>
+          <li>
+            <span class="footnote-sym">&#177;</span>
+            Listed pricing is Maximum Retail Price (inclusive of all applicable taxes).
+          </li>
+          <li>
+            <span class="footnote-sym">&#8224;</span>
+            Special Edition Luminex Buds Pro with Wireless Charging Case available in India at Luminex Store locations and Luminex Store Online while supplies last. Quantity limit of 2 units per customer.
+          </li>
+          <li>
+            <span class="footnote-sym">&#8225;</span>
+            Luminex Trade In values vary based on the condition, year and configuration of your eligible trade-in device. Not all devices are eligible for credit. Trade-in value may be applied towards a qualifying new device purchase.
+          </li>
+          <li>
+            <span class="footnote-sym">*</span>
+            Subscription required. Luminex Music offer valid for new subscribers only. &#8377;99.00/month after trial. Offer good for three months after eligible device activation.
+          </li>
+          <li>
+            <span class="footnote-sym">&infin;</span>
+            Available to current and newly accepted college students, parents buying for college students, and teachers and staff at all levels. Terms apply.
+          </li>
+          <li>
+            <span class="footnote-sym">1.</span>
+            Based on testing conducted by Luminex in August 2026 using preproduction devices and software. Battery life and charge cycles vary by use and configuration.
+          </li>
+          <li>
+            <span class="footnote-sym">2.</span>
+            Luminex Intelligence and Aura AI are available in beta with device language set to English (India, US, UK, Australia). Certain features require high-bandwidth wireless connectivity.
+          </li>
+        </ol>
+        <p class="apple-footer__geo">
+          We use your location to show you delivery options faster. We found your location using your IP address or because you entered it during a previous visit to Luminex.
+        </p>
+      </section>
+
+      <!-- Breadcrumb Bar -->
+      <div class="apple-footer__breadcrumbs">
+        <a href="{% url 'store:home' %}" class="apple-footer__crumb-home" aria-label="Luminex Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px;">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>
+          </svg>
+        </a>
+        <span class="apple-footer__crumb-sep">&rsaquo;</span>
+        <span class="apple-footer__crumb-current">Luminex Store Online</span>
+      </div>
+
+      <!-- 5-Column Directory -->
+      <div class="apple-footer__directory">
+
+        <!-- Column 1: Shop and Learn & Wallet -->
+        <div class="apple-footer__col">
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Shop and Learn</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:home' %}">Store</a></li>
+              <li><a href="{% url 'store:category_detail' 'laptops' %}">Book (Laptops)</a></li>
+              <li><a href="{% url 'store:category_detail' 'tablets' %}">Pad (Tablets)</a></li>
+              <li><a href="{% url 'store:category_detail' 'smartphones' %}">Phone (Smartphones)</a></li>
+              <li><a href="{% url 'store:category_detail' 'wearables' %}">Watch (Wearables)</a></li>
+              <li><a href="{% url 'store:category_detail' 'audio' %}">Buds &amp; Audio</a></li>
+              <li><a href="{% url 'store:category_detail' 'accessories' %}">Accessories</a></li>
+              <li><a href="{% url 'store:product_list' %}">Gift Cards</a></li>
+            </ul>
+          </div>
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Luminex Wallet</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'accounts:profile' %}">Wallet</a></li>
+              <li><a href="{% url 'store:cart_detail' %}">Luminex Pay</a></li>
+            </ul>
           </div>
         </div>
 
-        <!-- Products -->
-        <div>
-          <div class="footer__col-title">Products</div>
-          <a href="{% url 'store:product_list' %}" class="footer__link">All Products</a>
-          {% for cat in nav_categories %}
-            <a href="{% url 'store:category_detail' cat.slug %}" class="footer__link">{{ cat.name }}</a>
-          {% endfor %}
+        <!-- Column 2: Account & Entertainment -->
+        <div class="apple-footer__col">
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Account</h3>
+            <ul class="apple-footer__links">
+              {% if user.is_authenticated %}
+                <li><a href="{% url 'accounts:profile' %}">Manage Your Luminex Account</a></li>
+                <li><a href="{% url 'accounts:profile' %}">Luminex Store Account</a></li>
+                <li><a href="{% url 'accounts:profile' %}">Cloud Storage</a></li>
+              {% else %}
+                <li><a href="{% url 'accounts:login' %}">Manage Your Luminex Account</a></li>
+                <li><a href="{% url 'accounts:login' %}">Luminex Store Account</a></li>
+                <li><a href="{% url 'accounts:register' %}">Create Account</a></li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Entertainment</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Luminex One</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex TV+</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Music</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Arcade</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Podcasts</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Books</a></li>
+              <li><a href="{% url 'store:product_list' %}">App Store</a></li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Account -->
-        <div>
-          <div class="footer__col-title">Account</div>
-          {% if user.is_authenticated %}
-            <a href="{% url 'accounts:profile' %}" class="footer__link">My Profile</a>
-          {% else %}
-            <a href="{% url 'accounts:login' %}" class="footer__link">Sign In</a>
-            <a href="{% url 'accounts:register' %}" class="footer__link">Create Account</a>
-          {% endif %}
+        <!-- Column 3: Luminex Store -->
+        <div class="apple-footer__col">
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Luminex Store</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Find a Store</a></li>
+              <li><a href="{% url 'store:product_list' %}">Genius Bar</a></li>
+              <li><a href="{% url 'store:product_list' %}">Today at Luminex</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Camp</a></li>
+              <li><a href="{% url 'store:product_list' %}">Ways to Buy</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Trade In</a></li>
+              <li><a href="{% url 'store:product_list' %}">Recycling Programme</a></li>
+              <li><a href="{% url 'accounts:profile' %}">Order Status</a></li>
+              <li><a href="{% url 'store:product_list' %}">Shopping Help</a></li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Support -->
-        <div>
-          <div class="footer__col-title">Support</div>
-          <a href="#" class="footer__link">Help Centre</a>
-          <a href="#" class="footer__link">Contact Us</a>
-          <a href="#" class="footer__link">Shipping Info</a>
-          <a href="#" class="footer__link">Returns</a>
+        <!-- Column 4: Business, Education & Healthcare -->
+        <div class="apple-footer__col">
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">For Business</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Luminex and Business</a></li>
+              <li><a href="{% url 'store:product_list' %}">Shop for Business</a></li>
+            </ul>
+          </div>
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">For Education</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Luminex and Education</a></li>
+              <li><a href="{% url 'store:product_list' %}">Shop for Education</a></li>
+              <li><a href="{% url 'store:product_list' %}">Shop for University</a></li>
+            </ul>
+          </div>
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">For Healthcare</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Luminex in Healthcare</a></li>
+              <li><a href="{% url 'store:product_list' %}">Health on Luminex Watch</a></li>
+            </ul>
+          </div>
         </div>
+
+        <!-- Column 5: Values & About -->
+        <div class="apple-footer__col">
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">Luminex Values</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Accessibility</a></li>
+              <li><a href="{% url 'store:product_list' %}">Environment</a></li>
+              <li><a href="{% url 'store:product_list' %}">Privacy</a></li>
+              <li><a href="{% url 'store:product_list' %}">Supply Chain Innovation</a></li>
+            </ul>
+          </div>
+          <div class="apple-footer__section">
+            <h3 class="apple-footer__col-title">About Luminex</h3>
+            <ul class="apple-footer__links">
+              <li><a href="{% url 'store:product_list' %}">Newsroom</a></li>
+              <li><a href="{% url 'store:product_list' %}">Luminex Leadership</a></li>
+              <li><a href="{% url 'store:product_list' %}">Career Opportunities</a></li>
+              <li><a href="{% url 'store:product_list' %}">Investors</a></li>
+              <li><a href="{% url 'store:product_list' %}">Ethics &amp; Compliance</a></li>
+              <li><a href="{% url 'store:product_list' %}">Events</a></li>
+              <li><a href="{% url 'store:product_list' %}">Contact Luminex</a></li>
+            </ul>
+          </div>
+        </div>
+
       </div>
 
-      <div class="footer__bottom">
-        <p class="footer__copy">Copyright &copy; {% now "Y" %} Luminex Technologies Pvt. Ltd. All rights reserved.</p>
-        <div class="footer__bottom-links">
-          <a href="#" class="footer__bottom-link">Privacy Policy</a>
-          <a href="#" class="footer__bottom-link">Terms of Use</a>
-          <a href="#" class="footer__bottom-link">Sitemap</a>
-        </div>
+      <!-- Retailer note -->
+      <div class="apple-footer__retailer">
+        More ways to shop: <a href="{% url 'store:product_list' %}">Find a Luminex Store</a> or other retailer near you. Or call <a href="tel:0008000401966">000800 040 1966</a>.
       </div>
+
+      <!-- Legal Bar -->
+      <div class="apple-footer__legal">
+        <div class="apple-footer__legal-copy">
+          Copyright &copy; {% now "Y" %} Luminex Inc. All rights reserved.
+        </div>
+        <div class="apple-footer__legal-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Sales Policy</a>
+          <a href="#">Legal</a>
+          <a href="#">Site Map</a>
+        </div>
+        <div class="apple-footer__country">India</div>
+      </div>
+
     </div>
   </footer>
 

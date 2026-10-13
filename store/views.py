@@ -19,6 +19,8 @@ def home(request):
     featured_products = Product.objects.filter(is_active=True, is_featured=True).select_related('category')[:8]
     new_arrivals = Product.objects.filter(is_active=True, is_new_arrival=True).select_related('category')[:8]
     categories = Category.objects.filter(is_active=True).order_by('sort_order')[:8]
+    audio_products = Product.objects.filter(is_active=True, category__slug='audio').order_by('price')[:4]
+    accessories_products = Product.objects.filter(is_active=True, category__slug='accessories').order_by('price')[:4]
 
     context = {
         'hero_banners': hero_banners,
@@ -26,6 +28,8 @@ def home(request):
         'featured_products': featured_products,
         'new_arrivals': new_arrivals,
         'categories': categories,
+        'audio_products': audio_products,
+        'accessories_products': accessories_products,
         'page_title': 'Luminex Store — The best way to buy products you love',
     }
     return render(request, 'store/home.html', context)

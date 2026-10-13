@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 360" width="520" height="360">
+  <defs>
+    <filter id="eduShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="520" height="360" rx="24" fill="#f0f4f8"/>
+
+  <!-- Student setup: Book Air, Pad with Pencil, and Watch -->
+  <!-- Laptop in back -->
+  <g transform="translate(100, 50)" filter="url(#eduShadow)">
+    <rect x="0" y="0" width="280" height="180" rx="14" fill="#1d1d1f"/>
+    <!-- Screen showing code / notes -->
+    <rect x="8" y="8" width="264" height="164" rx="10" fill="#0f172a"/>
+    <text x="25" y="40" font-family="monospace" font-size="12" fill="#38bdf8">const future = study();</text>
+    <text x="25" y="65" font-family="monospace" font-size="12" fill="#a855f7">createAmazingProjects();</text>
+    <!-- Base -->
+    <path d="M -20 180 L 300 180 L 285 195 L -5 195 Z" fill="#334155"/>
+  </g>
+
+  <!-- Pad Pro in front with Procreate/Notes -->
+  <g transform="translate(260, 110)" filter="url(#eduShadow)">
+    <rect x="0" y="0" width="180" height="210" rx="20" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="6" y="6" width="168" height="198" rx="16" fill="#1e1e24"/>
+    <!-- Drawing on Pad -->
+    <path d="M 30 160 Q 60 70 110 120 T 150 60" fill="none" stroke="#f43f5e" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="150" cy="60" r="6" fill="#fbbf24"/>
+  </g>
+
+  <!-- Luminex Stylus Pencil -->
+  <g transform="translate(380, 70) rotate(-35)" filter="url(#eduShadow)">
+    <rect x="0" y="0" width="10" height="160" rx="5" fill="#f8fafc"/>
+    <polygon points="0,0 10,0 5,-12" fill="#334155"/>
+  </g>
+</svg>

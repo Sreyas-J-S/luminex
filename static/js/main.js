@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnimateOnScroll();
   initSortRedirect();
   initAppleCarousels();
+  initBagDropdown();
 });
 
 // ============================================================
@@ -285,6 +286,35 @@ function initAppleCarousels() {
       nextBtn.addEventListener('click', () => {
         track.scrollBy({ left: 400, behavior: 'smooth' });
       });
+    }
+  });
+}
+
+// ============================================================
+// Shopping Bag Flyout Popover
+// ============================================================
+function initBagDropdown() {
+  const bagButton = document.getElementById('bag-button');
+  const bagDropdown = document.getElementById('bag-dropdown');
+  if (!bagButton || !bagDropdown) return;
+
+  bagButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = bagDropdown.classList.toggle('is-active');
+    bagButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!bagButton.contains(e.target) && !bagDropdown.contains(e.target)) {
+      bagDropdown.classList.remove('is-active');
+      bagButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      bagDropdown.classList.remove('is-active');
+      bagButton.setAttribute('aria-expanded', 'false');
     }
   });
 }

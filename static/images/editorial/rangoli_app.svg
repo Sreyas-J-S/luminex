@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 420" width="360" height="420">
+  <defs>
+    <filter id="phoneShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="rangoliBloom" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="50%" stop-color="#ff7b00"/>
+      <stop offset="100%" stop-color="#7928ca"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Smartphone chassis -->
+  <g filter="url(#phoneShadow)" transform="translate(60, 20)">
+    <rect x="0" y="0" width="240" height="380" rx="42" fill="#1d1d1f"/>
+    <!-- Screen bezel -->
+    <rect x="6" y="6" width="228" height="368" rx="36" fill="#0d0d11"/>
+    <!-- Screen interior -->
+    <rect x="10" y="10" width="220" height="360" rx="32" fill="#fff"/>
+    <!-- Dynamic Island / Speaker notch -->
+    <rect x="85" y="18" width="70" height="18" rx="9" fill="#000"/>
+    
+    <!-- UI Header -->
+    <text x="30" y="55" font-family="-apple-system, sans-serif" font-size="14" fill="#86868b">✕</text>
+    <text x="120" y="55" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#1d1d1f">Create your rangoli</text>
+    <text x="205" y="55" font-family="-apple-system, sans-serif" font-size="14" fill="#0071e3">↑</text>
+
+    <!-- Rangoli art in center -->
+    <g transform="translate(120, 190)">
+      <!-- Petals layered -->
+      {% for i in 1..8 %}
+      <circle cx="0" cy="0" r="70" fill="none" stroke="#ffe5ec" stroke-width="4"/>
+      <!-- Flower petals -->
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(0)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(45)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(90)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(135)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(180)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(225)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(270)"/>
+      <path d="M 0 0 C 25 -40, 50 -40, 50 0 C 50 40, 25 40, 0 0" fill="url(#rangoliBloom)" opacity="0.85" transform="rotate(315)"/>
+      <!-- Inner core -->
+      <circle cx="0" cy="0" r="18" fill="#ffd166"/>
+      <circle cx="0" cy="0" r="10" fill="#fff"/>
+    </g>
+
+    <!-- Interactive button at bottom -->
+    <rect x="70" y="320" width="100" height="32" rx="16" fill="#f5f5f7"/>
+    <text x="120" y="341" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#ff007f">✨ Mix it up</text>
+  </g>
+</svg>
