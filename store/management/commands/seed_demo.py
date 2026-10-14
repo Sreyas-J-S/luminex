@@ -17,30 +17,37 @@ class Command(BaseCommand):
         self.stdout.write('🌱 Seeding Luminex demo data...')
 
         # --- Superuser ---
-        if settings.DEBUG:
-            if not User.objects.filter(username='admin').exists():
-                User.objects.create_superuser('admin', 'admin@luminex.com', 'admin123')
-                self.stdout.write(self.style.SUCCESS('  ✓ Superuser created for local development: admin / admin123'))
-            else:
-                self.stdout.write('  · Superuser already exists')
-        else:
-            # Production environment: do NOT create predictable credentials
-            admin_user = os.getenv('ADMIN_USERNAME')
-            admin_pass = os.getenv('ADMIN_PASSWORD')
+        if settings.DEBUG or os.getenv('RENDER') or os.getenv('ADMIN_USERNAME'):
+            admin_user = os.getenv('ADMIN_USERNAME', 'admin')
+            admin_pass = os.getenv('ADMIN_PASSWORD', 'admin123')
             admin_email = os.getenv('ADMIN_EMAIL', 'admin@luminex.com')
-            if admin_user and admin_pass:
-                if not User.objects.filter(username=admin_user).exists():
-                    User.objects.create_superuser(admin_user, admin_email, admin_pass)
-                    self.stdout.write(self.style.SUCCESS(f'  ✓ Production superuser created from environment: {admin_user}'))
-                else:
-                    self.stdout.write(f'  · Superuser {admin_user} already exists')
+
+            user = User.objects.filter(username=admin_user).first()
+            if not user:
+                User.objects.create_superuser(admin_user, admin_email, admin_pass)
+                self.stdout.write(self.style.SUCCESS(f'  ✓ Superuser created: {admin_user}'))
             else:
-                self.stdout.write(
-                    self.style.WARNING(
-                        '  ! Production environment detected (DEBUG=False): skipping default "admin" account creation.\n'
-                        '    Please create a secure administrator using: python manage.py createsuperuser'
-                    )
+                if not user.is_staff or not user.is_superuser:
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save(update_fields=['is_staff', 'is_superuser'])
+                    self.stdout.write(self.style.SUCCESS(f'  ✓ Upgraded {admin_user} to superuser/staff'))
+                self.stdout.write(f'  · Superuser {admin_user} ready')
+
+            # Also grant staff/superuser to 'sreyas' if the account was registered on Render
+            sreyas_user = User.objects.filter(username='sreyas').first()
+            if sreyas_user and (not sreyas_user.is_staff or not sreyas_user.is_superuser):
+                sreyas_user.is_staff = True
+                sreyas_user.is_superuser = True
+                sreyas_user.save(update_fields=['is_staff', 'is_superuser'])
+                self.stdout.write(self.style.SUCCESS('  ✓ Granted admin/staff access to user: sreyas'))
+        else:
+            self.stdout.write(
+                self.style.WARNING(
+                    '  ! Production environment detected (DEBUG=False): skipping default "admin" account creation.\n'
+                    '    Set ADMIN_USERNAME/ADMIN_PASSWORD or run on Render to auto-create.'
                 )
+            )
 
         # --- Categories ---
         cats = [
