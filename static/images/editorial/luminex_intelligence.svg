@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 360" width="500" height="360">
   <defs>
-    <linearGradient id="aiGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="intelligenceGlow" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ff007f"/>
       <stop offset="25%" stop-color="#7928ca"/>
       <stop offset="50%" stop-color="#0070f3"/>
@@ -15,13 +15,13 @@
 
   <rect width="500" height="360" rx="24" fill="#0d0d12"/>
 
-  <!-- Glowing Siri/Aura AI border around screen -->
-  <rect x="50" y="40" width="400" height="280" rx="32" fill="none" stroke="url(#aiGlow)" stroke-width="8" filter="url(#glowBlur)"/>
+  <!-- Glowing border around screen -->
+  <rect x="50" y="40" width="400" height="280" rx="32" fill="none" stroke="url(#intelligenceGlow)" stroke-width="8" filter="url(#glowBlur)"/>
 
   <!-- Screen Content Window -->
   <rect x="54" y="44" width="392" height="272" rx="28" fill="#18181f"/>
 
-  <!-- AI Writing Tool overlay card -->
+  <!-- Writing Assistant overlay card -->
   <rect x="90" y="80" width="320" height="180" rx="18" fill="#24242e" stroke="rgba(255,255,255,0.1)"/>
   
   <text x="115" y="115" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Luminex Intelligence</text>
@@ -31,8 +31,8 @@
   <rect x="115" y="155" width="220" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
   <rect x="115" y="175" width="250" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
   
-  <!-- AI Suggestion Pill -->
-  <rect x="115" y="205" width="120" height="32" rx="16" fill="url(#aiGlow)"/>
+  <!-- Suggestion Pill -->
+  <rect x="115" y="205" width="120" height="32" rx="16" fill="url(#intelligenceGlow)"/>
   <text x="175" y="226" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">Make Friendly</text>
 
   <rect x="245" y="205" width="100" height="32" rx="16" fill="#323240"/>

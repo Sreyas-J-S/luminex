@@ -1736,6 +1736,175 @@ input, textarea, select { font-family: inherit; }
   background: transparent;
 }
 
+/* --- Apple Global Header & Flyout Mega-Menu System --- */
+.global-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
+.global-header.has-flyout .navbar,
+.global-header:has(.navbar-flyout.is-active) .navbar,
+.global-header:has(.navbar__nav-link[data-flyout]:hover) .navbar,
+.global-header:has(.navbar-flyout:hover) .navbar {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.navbar-flyout {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: max-height 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, visibility 0.22s ease;
+  pointer-events: none;
+}
+
+.global-header:has(.navbar__nav-link[data-flyout]:hover) .navbar-flyout,
+.global-header:has(.navbar-flyout:hover) .navbar-flyout,
+.navbar-flyout.is-active {
+  max-height: 520px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.navbar-flyout__inner {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 2.25rem 2rem 3.5rem 2rem;
+  position: relative;
+}
+
+.navbar-flyout__panel {
+  display: none;
+  grid-template-columns: minmax(260px, 1.4fr) minmax(180px, 1fr) minmax(180px, 1fr);
+  gap: 3.5rem;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.global-header:has(.navbar__nav-link[data-flyout="store"]:hover) .navbar-flyout__panel[data-panel="store"],
+.global-header:has(.navbar__nav-link[data-flyout="smartphones"]:hover) .navbar-flyout__panel[data-panel="smartphones"],
+.global-header:has(.navbar__nav-link[data-flyout="laptops"]:hover) .navbar-flyout__panel[data-panel="laptops"],
+.global-header:has(.navbar__nav-link[data-flyout="audio"]:hover) .navbar-flyout__panel[data-panel="audio"],
+.global-header:has(.navbar__nav-link[data-flyout="wearables"]:hover) .navbar-flyout__panel[data-panel="wearables"],
+.global-header:has(.navbar__nav-link[data-flyout="tablets"]:hover) .navbar-flyout__panel[data-panel="tablets"],
+.global-header:has(.navbar__nav-link[data-flyout="accessories"]:hover) .navbar-flyout__panel[data-panel="accessories"],
+.global-header:has(.navbar__nav-link[data-flyout="all"]:hover) .navbar-flyout__panel[data-panel="all"],
+.global-header:has(.navbar__nav-link[data-flyout="support"]:hover) .navbar-flyout__panel[data-panel="support"],
+.navbar-flyout__panel.is-active {
+  display: grid !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.flyout-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flyout-heading {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6e6e73;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.flyout-links-primary {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.flyout-links-primary li a {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  display: inline-block;
+}
+
+.flyout-links-primary li a:hover {
+  color: #0071e3;
+}
+
+.flyout-links-secondary {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.flyout-links-secondary li a {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+  display: inline-block;
+}
+
+.flyout-links-secondary li a:hover {
+  color: #0071e3;
+  text-decoration: underline;
+}
+
+/* Translucent Fullscreen Scrim Backdrop */
+.navbar-scrim {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: calc(100vh - 44px);
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease;
+  z-index: 998;
+}
+
+body:has(.global-header:has(.navbar__nav-link[data-flyout]:hover)) .navbar-scrim,
+body:has(.global-header:has(.navbar-flyout:hover)) .navbar-scrim,
+.navbar-scrim.is-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+@media (max-width: 834px) {
+  .navbar-flyout,
+  .navbar-scrim {
+    display: none !important;
+  }
+}
+
 /* Shopping Bag Icon & Badge */
 .navbar__bag {
   position: relative;

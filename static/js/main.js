@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSortRedirect();
   initAppleCarousels();
   initBagDropdown();
+  initNavbarFlyout();
 });
 
 // ============================================================
@@ -315,6 +316,109 @@ function initBagDropdown() {
     if (e.key === 'Escape') {
       bagDropdown.classList.remove('is-active');
       bagButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// ============================================================
+// Apple-Style Navigation Flyout Mega Menu
+// ============================================================
+function initNavbarFlyout() {
+  const header = document.getElementById('global-header');
+  const flyout = document.getElementById('navbar-flyout');
+  const scrim = document.getElementById('navbar-scrim');
+  const navLinks = document.querySelectorAll('.navbar__nav-link[data-flyout]');
+  const panels = document.querySelectorAll('.navbar-flyout__panel');
+  const bagDropdown = document.getElementById('bag-dropdown');
+  const bagButton = document.getElementById('bag-button');
+
+  if (!header || !flyout || !navLinks.length) return;
+
+  let closeTimer = null;
+
+  function openFlyout(targetSlug) {
+    if (window.innerWidth < 834) return;
+    clearTimeout(closeTimer);
+
+    if (bagDropdown) {
+      bagDropdown.classList.remove('is-active');
+      if (bagButton) bagButton.setAttribute('aria-expanded', 'false');
+    }
+
+    panels.forEach(panel => {
+      if (panel.getAttribute('data-panel') === targetSlug) {
+        panel.classList.add('is-active');
+      } else {
+        panel.classList.remove('is-active');
+      }
+    });
+
+    header.classList.add('has-flyout');
+    flyout.classList.add('is-active');
+    if (scrim) scrim.classList.add('is-active');
+  }
+
+  function scheduleClose() {
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => {
+      closeFlyout();
+    }, 250);
+  }
+
+  function closeFlyout() {
+    clearTimeout(closeTimer);
+    if (header) header.classList.remove('has-flyout');
+    flyout.classList.remove('is-active');
+    if (scrim) scrim.classList.remove('is-active');
+    panels.forEach(panel => panel.classList.remove('is-active'));
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('mouseenter', () => {
+      const slug = link.getAttribute('data-flyout');
+      openFlyout(slug);
+    });
+
+    link.addEventListener('mouseover', () => {
+      const slug = link.getAttribute('data-flyout');
+      openFlyout(slug);
+    });
+
+    link.addEventListener('focus', () => {
+      const slug = link.getAttribute('data-flyout');
+      openFlyout(slug);
+    });
+  });
+
+  header.addEventListener('mouseenter', () => {
+    clearTimeout(closeTimer);
+  });
+
+  header.addEventListener('mouseleave', () => {
+    scheduleClose();
+  });
+
+  if (bagButton) {
+    bagButton.addEventListener('mouseenter', () => {
+      closeFlyout();
+    });
+  }
+
+  if (scrim) {
+    scrim.addEventListener('click', () => {
+      closeFlyout();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeFlyout();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 834) {
+      closeFlyout();
     }
   });
 }

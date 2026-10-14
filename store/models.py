@@ -72,7 +72,6 @@ class Product(models.Model):
                 counter += 1
             self.slug = slug
         if not self.sku:
-            import uuid
             self.sku = f"LMX-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)
 
