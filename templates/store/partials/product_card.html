@@ -11,7 +11,14 @@
 
   <!-- Image -->
   <div class="product-card__image-wrap">
-    {% if product.main_image %}
+    {% if product.image_url %}
+      <img
+        class="product-card__img"
+        src="{{ product.image_url }}"
+        alt="{{ product.name }}"
+        loading="lazy"
+      />
+    {% elif product.main_image %}
       <img
         class="product-card__img"
         src="{{ product.main_image.url }}"

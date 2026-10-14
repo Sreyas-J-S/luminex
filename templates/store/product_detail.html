@@ -24,11 +24,11 @@
       <!-- Gallery -->
       <div class="product-gallery">
         <div class="product-gallery__main">
-          {% if product.main_image %}
+          {% if product.image_url or product.main_image %}
             <img
               class="product-gallery__main-img"
               id="main-gallery-img"
-              src="{{ product.main_image.url }}"
+              src="{{ product.image_url|default:product.main_image.url }}"
               alt="{{ product.name }}"
             />
           {% else %}
@@ -41,11 +41,11 @@
         </div>
 
         <!-- Thumbnails -->
-        {% if gallery or product.main_image %}
+        {% if gallery or product.image_url or product.main_image %}
         <div class="product-gallery__thumbs">
-          {% if product.main_image %}
-            <div class="product-gallery__thumb is-active" data-src="{{ product.main_image.url }}">
-              <img class="product-gallery__thumb-img" src="{{ product.main_image.url }}" alt="{{ product.name }} main" />
+          {% if product.image_url or product.main_image %}
+            <div class="product-gallery__thumb is-active" data-src="{{ product.image_url|default:product.main_image.url }}">
+              <img class="product-gallery__thumb-img" src="{{ product.image_url|default:product.main_image.url }}" alt="{{ product.name }} main" />
             </div>
           {% endif %}
           {% for img in gallery %}

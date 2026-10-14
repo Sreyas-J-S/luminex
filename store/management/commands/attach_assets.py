@@ -1,6 +1,6 @@
 """
 Management command to attach high-fidelity original vector assets to Products and Categories.
-Run: python manage.py attach_assets
+Run: python manage.py attach_assets [--force]
 """
 from django.core.management.base import BaseCommand
 from store.models import Category, Product, Banner
@@ -29,33 +29,46 @@ CAT_MAP = {
     'Accessories': 'categories/cat_accessories.svg',
 }
 
-class Command(BaseCommand):
-    help = 'Attach vector assets to products and categories'
 
-    def handle(self, *args, **kwargs):
+class Command(BaseCommand):
+    help = 'Safely attach vector assets to demo products and categories without overwriting custom uploads'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Force overwrite existing image paths with demo vector assets'
+        )
+
+    def handle(self, *args, **options):
+        force = options.get('force', False)
         self.stdout.write('Attaching assets to catalog...')
+
         for name, img_path in PRODUCT_MAP.items():
             prod = Product.objects.filter(name=name).first()
             if prod:
-                prod.main_image = img_path
-                prod.save()
-                self.stdout.write(f'  ✓ Product: {name} -> {img_path}')
+                if not prod.main_image or force:
+                    prod.main_image = img_path
+                    prod.save(update_fields=['main_image'])
+                    self.stdout.write(f'  ✓ Product: {name} -> {img_path}')
+                else:
+                    self.stdout.write(f'  · Product {name} already has image: {prod.main_image}')
 
         for cat_name, img_path in CAT_MAP.items():
             cat = Category.objects.filter(name=cat_name).first()
             if cat:
-                cat.image = img_path
-                cat.save()
-                self.stdout.write(f'  ✓ Category: {cat_name} -> {img_path}')
+                if not cat.image or force:
+                    cat.image = img_path
+                    cat.save(update_fields=['image'])
+                    self.stdout.write(f'  ✓ Category: {cat_name} -> {img_path}')
+                else:
+                    self.stdout.write(f'  · Category {cat_name} already has image: {cat.image}')
 
         # Attach to banners if relevant
-        b1 = Banner.objects.filter(title='Luminex Pro 15').first()
-        if b1:
+        b1 = Banner.objects.filter(title='Luminex Pro 15', position='hero').first()
+        if b1 and (not b1.image or force):
             b1.image = 'products/luminex_pro_15.svg'
-            b1.save()
-        b2 = Banner.objects.filter(title='Luminex Book Pro 16').first()
-        if b2:
-            b2.image = 'products/luminex_book_pro_16.svg'
-            b2.save()
+            b1.save(update_fields=['image'])
+            self.stdout.write('  ✓ Banner: Luminex Pro 15 -> products/luminex_pro_15.svg')
 
-        self.stdout.write(self.style.SUCCESS('All assets attached successfully.'))
+        self.stdout.write(self.style.SUCCESS('All assets verified/attached successfully.'))

@@ -6,6 +6,9 @@ from django.utils.text import slugify
 from django.urls import reverse
 from django.contrib.auth.models import User
 import uuid
+import os
+from django.templatetags.static import static
+from django.contrib.staticfiles import finders
 
 
 class Category(models.Model):
@@ -31,6 +34,39 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('store:category_detail', kwargs={'slug': self.slug})
+
+    @property
+    def image_url(self):
+        """
+        Returns a working URL for the category icon.
+        Prefers the static SVG asset matching the category slug or image name,
+        ensuring production availability without relying on ephemeral media files.
+        Falls back to image.url if a custom uploaded media file exists.
+        """
+        # 1. Direct match by category slug in static assets
+        if self.slug:
+            slug_key = self.slug.replace('-', '_')
+            static_candidate = f"images/categories/cat_{slug_key}.svg"
+            if finders.find(static_candidate):
+                return static(static_candidate)
+
+        # 2. Check if self.image points to a static file or filename
+        if self.image:
+            img_name = str(self.image.name).strip()
+            base = os.path.basename(img_name)
+            for candidate in [
+                f"images/categories/{base}",
+                f"images/{img_name}",
+                img_name,
+            ]:
+                if finders.find(candidate):
+                    return static(candidate)
+            try:
+                return self.image.url
+            except Exception:
+                pass
+
+        return None
 
 
 class Product(models.Model):
@@ -98,6 +134,36 @@ class Product(models.Model):
             return f"₹{self.original_price:,.2f}"
         return None
 
+    @property
+    def image_url(self):
+        """
+        Returns a reliable URL for the product main image.
+        Prefers static SVG assets that exist in Git for demo catalogue products,
+        falling back to main_image.url for user-uploaded media.
+        """
+        if self.main_image:
+            img_name = str(self.main_image.name).strip()
+            base = os.path.basename(img_name)
+            for candidate in [
+                f"images/products/{base}",
+                f"images/{img_name}",
+                img_name,
+            ]:
+                if finders.find(candidate):
+                    return static(candidate)
+            try:
+                return self.main_image.url
+            except Exception:
+                pass
+
+        if self.slug:
+            slug_key = self.slug.replace('-', '_')
+            candidate = f"images/products/{slug_key}.svg"
+            if finders.find(candidate):
+                return static(candidate)
+
+        return None
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(
@@ -155,6 +221,40 @@ class Banner(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.position})"
+
+    @property
+    def image_url(self):
+        """
+        Returns a reliable URL for banner graphics.
+        Prefers static product/banner assets that exist in Git,
+        falling back to self.image.url for user-uploaded media.
+        """
+        if self.image:
+            img_name = str(self.image.name).strip()
+            base = os.path.basename(img_name)
+            for candidate in [
+                f"images/products/{base}",
+                f"images/banners/{base}",
+                f"images/{img_name}",
+                img_name,
+            ]:
+                if finders.find(candidate):
+                    return static(candidate)
+            try:
+                return self.image.url
+            except Exception:
+                pass
+
+        if self.title:
+            title_slug = slugify(self.title).replace('-', '_')
+            for candidate in [
+                f"images/products/{title_slug}.svg",
+                f"images/banners/{title_slug}.svg",
+            ]:
+                if finders.find(candidate):
+                    return static(candidate)
+
+        return None
 
 
 class Cart(models.Model):

@@ -28,7 +28,9 @@
 
           <!-- Thumbnail -->
           <div class="bag-item__img-box">
-            {% if item.product.main_image %}
+            {% if item.product.image_url %}
+              <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" class="bag-item__img" />
+            {% elif item.product.main_image %}
               <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="bag-item__img" />
             {% else %}
               <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ item.product.name }}" class="bag-item__img" />

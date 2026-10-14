@@ -52,7 +52,9 @@
       {% for cat in categories %}
       <a href="{% url 'store:category_detail' cat.slug %}" class="category-strip__item">
         <div class="category-strip__icon-box">
-          {% if cat.image %}
+          {% if cat.image_url %}
+            <img src="{{ cat.image_url }}" alt="{{ cat.name }}" loading="lazy" />
+          {% elif cat.image %}
             <img src="{{ cat.image.url }}" alt="{{ cat.name }}" loading="lazy" />
           {% else %}
             <img src="{% static 'images/categories/cat_'|add:cat.slug|add:'.svg' %}" alt="{{ cat.name }}" />
@@ -71,9 +73,12 @@
 {% if hero_banners %}
 <section class="hero-slider" aria-label="Featured promotions">
   {% for banner in hero_banners %}
-  <div class="hero-slide {% if not banner.image %}hero-slide--color{% endif %}"
+  <div class="hero-slide {% if not banner.image_url and not banner.image %}hero-slide--color{% endif %}"
        style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
-    {% if banner.image %}
+    {% if banner.image_url %}
+      <img class="hero-slide__bg" src="{{ banner.image_url }}" alt="{{ banner.title }}" />
+      <div class="hero-slide__overlay"></div>
+    {% elif banner.image %}
       <img class="hero-slide__bg" src="{{ banner.image.url }}" alt="{{ banner.title }}" />
       <div class="hero-slide__overlay"></div>
     {% endif %}
@@ -161,7 +166,9 @@
         </div>
 
         <div class="apple-card__image-box">
-          {% if product.main_image %}
+          {% if product.image_url %}
+            <img class="apple-card__img" src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy" />
+          {% elif product.main_image %}
             <img class="apple-card__img" src="{{ product.main_image.url }}" alt="{{ product.name }}" loading="lazy" />
           {% else %}
             <img class="apple-card__img" src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ product.name }}" />
@@ -257,7 +264,9 @@
     <div class="promo-grid">
       {% for banner in promo_banners %}
       <div class="promo-card" style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
-        {% if banner.image %}
+        {% if banner.image_url %}
+          <img class="promo-card__img" src="{{ banner.image_url }}" alt="{{ banner.title }}" loading="lazy" />
+        {% elif banner.image %}
           <img class="promo-card__img" src="{{ banner.image.url }}" alt="{{ banner.title }}" loading="lazy" />
         {% endif %}
         <div class="promo-card__content">

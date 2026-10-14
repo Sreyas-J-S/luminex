@@ -113,7 +113,9 @@
               {% for item in cart_items %}
               <div style="display:flex; gap:0.875rem; align-items:center;">
                 <div style="width:48px; height:48px; background:var(--color-off-white); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                  {% if item.product.main_image %}
+                  {% if item.product.image_url %}
+                    <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" style="max-width:38px; max-height:38px; object-fit:contain;" />
+                  {% elif item.product.main_image %}
                     <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" style="max-width:38px; max-height:38px; object-fit:contain;" />
                   {% else %}
                     <span style="font-size:1.2rem;">📦</span>

@@ -89,7 +89,9 @@
                 {% for item in cart.items.all %}
                 <div class="bag-dropdown__item">
                   <div class="bag-dropdown__thumb">
-                    {% if item.product.main_image %}
+                    {% if item.product.image_url %}
+                      <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+                    {% elif item.product.main_image %}
                       <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
                     {% else %}
                       <img src="{% static 'images/products/luminex_pro_15.svg' %}" alt="{{ item.product.name }}">

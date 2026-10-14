@@ -586,3 +586,143 @@ class ProductionSettingsValidationTest(TestCase):
             self.assertTrue(mod.CSRF_COOKIE_SECURE)
 
 
+class SeedDemoIdempotencyAndSafetyTest(TestCase):
+    def test_seed_demo_populates_catalogue_and_is_idempotent(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        out = StringIO()
+        call_command('seed_demo', stdout=out)
+
+        # Verify initial population
+        self.assertEqual(Category.objects.count(), 6)
+        self.assertEqual(Product.objects.count(), 12)
+        self.assertEqual(Banner.objects.filter(position='hero').count(), 1)
+        self.assertEqual(Banner.objects.filter(position='promo').count(), 2)
+
+        # Verify that specific demo categories, products, and banners exist
+        self.assertTrue(Category.objects.filter(name='Smartphones').exists())
+        self.assertTrue(Product.objects.filter(name='Luminex Pro 15').exists())
+        self.assertTrue(Product.objects.filter(name='Luminex Book Pro 16').exists())
+        self.assertTrue(Banner.objects.filter(title='Luminex Pro 15', position='hero').exists())
+        self.assertFalse(Banner.objects.filter(title='Luminex Book Pro 16', position='hero').exists())
+
+        # Second run: must be completely idempotent (0 duplicates)
+        out2 = StringIO()
+        call_command('seed_demo', stdout=out2)
+
+        self.assertEqual(Category.objects.count(), 6)
+        self.assertEqual(Product.objects.count(), 12)
+        self.assertEqual(Banner.objects.count(), 3)
+
+    def test_seed_demo_preserves_existing_custom_production_data(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        # 1. Create a custom category, product, banner, user, and order before seeding
+        custom_cat = Category.objects.create(name="Custom Robotics", slug="custom-robotics")
+        custom_prod = Product.objects.create(
+            category=custom_cat,
+            name="Robo Arm X",
+            slug="robo-arm-x",
+            price=99999,
+            stock=5,
+            description="High precision robotics"
+        )
+        custom_banner = Banner.objects.create(
+            title="Robotics Revolution",
+            position="hero",
+            bg_color="#000000"
+        )
+        user = User.objects.create_user("customer1", "cust@example.com", "pass123")
+        order = Order.objects.create(
+            user=user,
+            full_name="Alice Smith",
+            email="alice@example.com",
+            phone="9876543210",
+            address_line1="123 Tech Park",
+            city="Bengaluru",
+            state="Karnataka",
+            postal_code="560001",
+            total_amount=99999
+        )
+
+        # Also create a demo product with custom user modifications (e.g. customized price and image)
+        existing_phone = Product.objects.create(
+            name="Luminex Pro 15",
+            slug="luminex-pro-15",
+            price=135000,  # customized price
+            stock=10,      # customized stock
+            description="Custom description by admin",
+            main_image="custom/my_photo.png"
+        )
+
+        # Run seed_demo
+        out = StringIO()
+        call_command('seed_demo', stdout=out)
+
+        # Verify custom data is completely preserved
+        self.assertTrue(Category.objects.filter(name="Custom Robotics").exists())
+        self.assertTrue(Product.objects.filter(name="Robo Arm X").exists())
+        self.assertTrue(Banner.objects.filter(title="Robotics Revolution").exists())
+        self.assertTrue(User.objects.filter(username="customer1").exists())
+        self.assertTrue(Order.objects.filter(id=order.id).exists())
+
+        # Verify existing customized demo product was NOT overwritten
+        phone_refresh = Product.objects.get(id=existing_phone.id)
+        self.assertEqual(phone_refresh.price, 135000)
+        self.assertEqual(phone_refresh.stock, 10)
+        self.assertEqual(phone_refresh.description, "Custom description by admin")
+        self.assertEqual(str(phone_refresh.main_image), "custom/my_photo.png")
+
+
+class AttachAssetsSafetyTest(TestCase):
+    def test_attach_assets_does_not_overwrite_custom_images_without_force(self):
+        from django.core.management import call_command
+        from io import StringIO
+
+        cat = Category.objects.create(name="Smartphones", image="custom/phone.png")
+        prod = Product.objects.create(name="Luminex Pro 15", price=129900, stock=10, main_image="custom/luminex.png")
+        banner = Banner.objects.create(title="Luminex Pro 15", position="hero", image="custom/banner.png")
+
+        out = StringIO()
+        call_command('attach_assets', stdout=out)
+
+        cat.refresh_from_db()
+        prod.refresh_from_db()
+        banner.refresh_from_db()
+
+        self.assertEqual(str(cat.image), "custom/phone.png")
+        self.assertEqual(str(prod.main_image), "custom/luminex.png")
+        self.assertEqual(str(banner.image), "custom/banner.png")
+
+
+class ModelImageUrlResolutionTest(TestCase):
+    def test_category_image_url_resolves_to_static_asset(self):
+        cat = Category.objects.create(name="Smartphones", slug="smartphones", image="categories/cat_smartphones.svg")
+        self.assertIn("/static/images/categories/cat_smartphones.svg", cat.image_url)
+
+        # Slug fallback when image field is None
+        cat_no_img = Category.objects.create(name="Laptops", slug="laptops")
+        self.assertIn("/static/images/categories/cat_laptops.svg", cat_no_img.image_url)
+
+    def test_banner_image_url_resolves_to_static_asset(self):
+        banner = Banner.objects.create(title="Luminex Pro 15", position="hero", image="products/luminex_pro_15.svg")
+        self.assertIn("/static/images/products/luminex_pro_15.svg", banner.image_url)
+
+        # Title slug fallback when image field is None
+        banner2 = Banner.objects.create(title="Luminex Book Pro 16", position="hero")
+        self.assertIn("/static/images/products/luminex_book_pro_16.svg", banner2.image_url)
+
+    def test_product_image_url_resolves_to_static_asset(self):
+        prod = Product.objects.create(
+            name="Luminex Watch Series 9",
+            slug="luminex-watch-series-9",
+            price=41900,
+            stock=10,
+            main_image="products/luminex_watch_series_9.svg"
+        )
+        self.assertIn("/static/images/products/luminex_watch_series_9.svg", prod.image_url)
+
+
+
