@@ -2304,7 +2304,7 @@ body:has(.global-header:has(.navbar-flyout:hover)) .navbar-scrim,
 
 /* --- Horizontal Apple Carousels --- */
 .apple-carousel-section {
-  padding: 3rem 0 4rem;
+  padding: 2.25rem 0 2.75rem;
   background-color: var(--color-off-white);
 }
 

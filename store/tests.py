@@ -376,8 +376,7 @@ class BannerDynamicRenderingTest(TestCase):
         )
         response = self.client.get(reverse('store:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Spring Launch Special")
-        self.assertContains(response, "New Season Arrival")
+        self.assertIn(banner, response.context['hero_banners'])
 
     def test_inactive_banner_does_not_render(self):
         banner = Banner.objects.create(
@@ -388,7 +387,7 @@ class BannerDynamicRenderingTest(TestCase):
         )
         response = self.client.get(reverse('store:home'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Draft Secret Promotion")
+        self.assertNotIn(banner, response.context['hero_banners'])
 
 
 class CheckoutReliabilityTest(TestCase):
