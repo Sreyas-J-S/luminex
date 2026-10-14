@@ -67,6 +67,49 @@
 </header>
 
 
+<!-- ====================== HERO BANNERS (DYNAMIC) ====================== -->
+{% if hero_banners %}
+<section class="hero-slider" aria-label="Featured promotions">
+  {% for banner in hero_banners %}
+  <div class="hero-slide {% if not banner.image %}hero-slide--color{% endif %}"
+       style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
+    {% if banner.image %}
+      <img class="hero-slide__bg" src="{{ banner.image.url }}" alt="{{ banner.title }}" />
+      <div class="hero-slide__overlay"></div>
+    {% endif %}
+    <div class="hero-slide__content">
+      {% if banner.subtitle %}
+        <div class="hero-slide__eyebrow" style="color: {{ banner.text_color }}; opacity:0.85;">{{ banner.subtitle }}</div>
+      {% endif %}
+      <h2 class="hero-slide__title" style="color: {{ banner.text_color }};">{{ banner.title }}</h2>
+      {% if banner.description %}
+        <p class="hero-slide__desc" style="color: {{ banner.text_color }}; opacity: 0.85;">{{ banner.description }}</p>
+      {% endif %}
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.25rem;">
+        {% if banner.cta_text and banner.cta_link %}
+          <a href="{{ banner.cta_link }}" class="btn btn--primary btn--lg" style="border-radius:12px;">{{ banner.cta_text }}</a>
+        {% endif %}
+        <a href="{% url 'store:product_list' %}" class="btn btn--secondary btn--lg" style="border-radius:12px;">Explore All</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if hero_banners|length > 1 %}
+  <div class="hero-dots" role="tablist" aria-label="Slide controls">
+    {% for banner in hero_banners %}
+      <button class="hero-dot {% if forloop.first %}is-active{% endif %}"
+              role="tab"
+              aria-label="Slide {{ forloop.counter }}"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+      </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+
 <!-- ====================== 1. "THE LATEST" PRODUCT CAROUSEL ====================== -->
 <section class="apple-carousel-section" aria-labelledby="latest-heading">
   <div class="container">
@@ -205,6 +248,36 @@
 
   </div>
 </section>
+
+
+<!-- ====================== PROMOTIONAL BANNERS (DYNAMIC) ====================== -->
+{% if promo_banners %}
+<section class="section" aria-label="Special promotions" style="padding: 2.5rem 0;">
+  <div class="container">
+    <div class="promo-grid">
+      {% for banner in promo_banners %}
+      <div class="promo-card" style="background-color: {{ banner.bg_color }}; color: {{ banner.text_color }};">
+        {% if banner.image %}
+          <img class="promo-card__img" src="{{ banner.image.url }}" alt="{{ banner.title }}" loading="lazy" />
+        {% endif %}
+        <div class="promo-card__content">
+          {% if banner.subtitle %}
+            <div class="promo-card__eyebrow" style="color: {{ banner.text_color }}; opacity:0.8;">{{ banner.subtitle }}</div>
+          {% endif %}
+          <h3 class="promo-card__title" style="color: {{ banner.text_color }};">{{ banner.title }}</h3>
+          {% if banner.description %}
+            <p class="promo-card__desc" style="color: {{ banner.text_color }}; opacity:0.85;">{{ banner.description }}</p>
+          {% endif %}
+          {% if banner.cta_text and banner.cta_link %}
+            <a href="{{ banner.cta_link }}" class="btn btn--primary" style="margin-top:0.75rem; display:inline-block; border-radius:10px;">{{ banner.cta_text }}</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
 
 
 <!-- ====================== 3. "JOY STARTS HERE" EDITORIAL CAROUSEL ====================== -->

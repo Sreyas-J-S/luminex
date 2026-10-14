@@ -18,8 +18,9 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%230071e3'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-size='18' font-weight='900' font-family='sans-serif'%3EL%3C/text%3E%3C/svg%3E" />
 
   {% block extra_head %}{% endblock %}
-</head>
 <body>
+  <!-- Skip to main content for screen readers & keyboard navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- ====================== GLOBAL HEADER & NAVBAR ====================== -->
   <header class="global-header" id="global-header">
@@ -104,7 +105,7 @@
               <div class="bag-dropdown__footer">
                 <div class="bag-dropdown__subtotal">
                   <span>Total:</span>
-                  <strong>{{ cart.formatted_total_price }}</strong>
+                  <strong>{{ cart.formatted_total }}</strong>
                 </div>
                 <div class="bag-dropdown__actions">
                   <a href="{% url 'store:cart_detail' %}" class="btn btn--outline btn--sm" style="flex:1; text-align:center;">Review Bag</a>
@@ -435,6 +436,26 @@
   <!-- ====================== MOBILE NAV ====================== -->
   <div class="navbar__mobile-overlay" id="mobile-nav" role="dialog" aria-label="Mobile navigation">
     <button class="navbar__mobile-close" aria-label="Close menu">&#x2715;</button>
+
+    <!-- Mobile Search Form -->
+    <div style="width: 100%; max-width: 280px; margin-bottom: 1rem;">
+      <form action="{% url 'store:search' %}" method="get" role="search" style="display:flex; align-items:center; background: rgba(0,0,0,0.06); border-radius: 10px; padding: 0.5rem 0.85rem; border: 1px solid rgba(0,0,0,0.08);">
+        <input
+          type="search"
+          name="q"
+          placeholder="Search Luminex…"
+          aria-label="Search products"
+          value="{{ request.GET.q|default:'' }}"
+          style="background: transparent; border: none; outline: none; width: 100%; font-size: 0.95rem; font-family: inherit; color: var(--color-charcoal);"
+        />
+        <button type="submit" aria-label="Submit search" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; color: var(--color-mid-grey); padding: 0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
     <a href="{% url 'store:home' %}" class="navbar__mobile-link">Store</a>
     <a href="{% url 'store:product_list' %}" class="navbar__mobile-link">All Products</a>
     {% for cat in nav_categories %}

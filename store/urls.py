@@ -1,5 +1,6 @@
 """Store URL patterns."""
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 
 app_name = 'store'
@@ -12,8 +13,9 @@ urlpatterns = [
     path('category/<slug:slug>/', views.category_detail, name='category_detail'),
     path('search/', views.search, name='search'),
 
-    # Cart & Bag
+    # Cart & Bag (with /cart/ alias)
     path('bag/', views.cart_detail, name='cart_detail'),
+    path('cart/', RedirectView.as_view(pattern_name='store:cart_detail', permanent=True)),
     path('bag/add/<int:product_id>/', views.cart_add, name='cart_add'),
     path('bag/update/<int:item_id>/', views.cart_update, name='cart_update'),
     path('bag/remove/<int:item_id>/', views.cart_remove, name='cart_remove'),

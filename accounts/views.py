@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from .forms import RegisterForm, LoginForm, ProfileUpdateForm
 
 
@@ -32,7 +33,7 @@ def register_view(request):
 
 
 def login_view(request):
-    """User login."""
+    """User login with open redirect protection."""
     if request.user.is_authenticated:
         return redirect('store:home')
 
@@ -41,7 +42,14 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            next_url = request.GET.get('next', '')
+            next_url = request.POST.get('next') or request.GET.get('next', '')
+            if not url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            ):
+                next_url = None
+
             messages.success(request, f"Welcome back, {user.first_name or user.username}!")
             return redirect(next_url if next_url else 'store:home')
         else:

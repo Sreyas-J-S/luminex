@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAppleCarousels();
   initBagDropdown();
   initNavbarFlyout();
+  initCheckoutForm();
 });
 
 // ============================================================
@@ -91,7 +92,10 @@ function initHeroSlider() {
     clearInterval(autoplayTimer);
   }
 
-  startAutoplay();
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReducedMotion) {
+    startAutoplay();
+  }
 
   dots.forEach((dot, i) => {
     dot.addEventListener('click', () => {
@@ -214,6 +218,15 @@ function initAnimateOnScroll() {
   const elements = document.querySelectorAll('.product-card, .category-card, .promo-card, .section-header');
 
   if (!elements.length || !('IntersectionObserver' in window)) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
+    elements.forEach(el => {
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+    return;
+  }
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -419,6 +432,47 @@ function initNavbarFlyout() {
   window.addEventListener('resize', () => {
     if (window.innerWidth < 834) {
       closeFlyout();
+    }
+  });
+}
+
+// ============================================================
+// Checkout Form Submit State & Idempotency Protection
+// ============================================================
+function initCheckoutForm() {
+  const form = document.getElementById('checkout-form');
+  const btn = document.getElementById('checkout-submit-btn');
+  if (!form || !btn) return;
+
+  const btnText = btn.querySelector('.checkout-btn-text');
+  const btnSpinner = btn.querySelector('.checkout-btn-spinner');
+
+  form.addEventListener('submit', (e) => {
+    if (!form.checkValidity()) {
+      return;
+    }
+
+    if (btn.disabled) {
+      e.preventDefault();
+      return;
+    }
+
+    btn.disabled = true;
+    btn.classList.add('is-submitting');
+    btn.style.opacity = '0.85';
+    btn.style.cursor = 'not-allowed';
+    if (btnText) btnText.style.display = 'none';
+    if (btnSpinner) btnSpinner.style.display = 'inline-flex';
+  });
+
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      btn.disabled = false;
+      btn.classList.remove('is-submitting');
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+      if (btnText) btnText.style.display = 'inline';
+      if (btnSpinner) btnSpinner.style.display = 'none';
     }
   });
 }

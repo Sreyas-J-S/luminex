@@ -2,8 +2,10 @@
 Management command to seed demo data for Luminex store.
 Run: python manage.py seed_demo
 """
+import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
+from django.conf import settings
 from store.models import Category, Product, Banner
 
 
@@ -14,11 +16,30 @@ class Command(BaseCommand):
         self.stdout.write('🌱 Seeding Luminex demo data...')
 
         # --- Superuser ---
-        if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@luminex.com', 'admin123')
-            self.stdout.write(self.style.SUCCESS('  ✓ Superuser created: admin / admin123'))
+        if settings.DEBUG:
+            if not User.objects.filter(username='admin').exists():
+                User.objects.create_superuser('admin', 'admin@luminex.com', 'admin123')
+                self.stdout.write(self.style.SUCCESS('  ✓ Superuser created for local development: admin / admin123'))
+            else:
+                self.stdout.write('  · Superuser already exists')
         else:
-            self.stdout.write('  · Superuser already exists')
+            # Production environment: do NOT create predictable credentials
+            admin_user = os.getenv('ADMIN_USERNAME')
+            admin_pass = os.getenv('ADMIN_PASSWORD')
+            admin_email = os.getenv('ADMIN_EMAIL', 'admin@luminex.com')
+            if admin_user and admin_pass:
+                if not User.objects.filter(username=admin_user).exists():
+                    User.objects.create_superuser(admin_user, admin_email, admin_pass)
+                    self.stdout.write(self.style.SUCCESS(f'  ✓ Production superuser created from environment: {admin_user}'))
+                else:
+                    self.stdout.write(f'  · Superuser {admin_user} already exists')
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        '  ! Production environment detected (DEBUG=False): skipping default "admin" account creation.\n'
+                        '    Please create a secure administrator using: python manage.py createsuperuser'
+                    )
+                )
 
         # --- Categories ---
         cats = [

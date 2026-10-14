@@ -2,11 +2,12 @@
 Store views for Luminex e-commerce platform.
 Features: catalog, search, cart, checkout, inventory validation, and orders.
 """
+import uuid
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.db import transaction
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from .models import Product, Category, Banner, Cart, CartItem, Order, OrderItem
 from .forms import CheckoutForm
 from .cart import get_or_create_cart, get_cart
@@ -138,6 +139,7 @@ def cart_detail(request):
     subtotal = cart.total_price
     free_shipping_threshold = 5000
     qualifies_free_shipping = subtotal >= free_shipping_threshold
+    free_shipping_deficit = max(0, free_shipping_threshold - subtotal) if subtotal > 0 else free_shipping_threshold
     delivery_fee = 0 if qualifies_free_shipping else (499 if subtotal > 0 else 0)
     grand_total = subtotal + delivery_fee
 
@@ -148,6 +150,8 @@ def cart_detail(request):
         'delivery_fee': delivery_fee,
         'grand_total': grand_total,
         'qualifies_free_shipping': qualifies_free_shipping,
+        'free_shipping_threshold': free_shipping_threshold,
+        'free_shipping_deficit': free_shipping_deficit,
         'page_title': 'Review your Bag — Luminex',
     }
     return render(request, 'store/cart.html', context)
@@ -236,11 +240,15 @@ def cart_remove(request, item_id):
 
 
 def checkout(request):
-    """Checkout view with server-side validation and stock deduction."""
+    """Checkout view with server-side validation, idempotency, and stock deduction."""
     cart = get_or_create_cart(request)
     cart_items = cart.items.select_related('product').all()
 
     if not cart_items.exists():
+        # Handle repeated submission / browser back: redirect to completed order if available
+        last_order = request.session.get('last_order_number')
+        if last_order:
+            return redirect('store:order_confirmation', order_number=last_order)
         messages.warning(request, "Your bag is empty. Please add items before proceeding to checkout.")
         return redirect('store:product_list')
 
@@ -264,41 +272,82 @@ def checkout(request):
             'email': request.user.email,
         }
 
+    # Generate or reuse checkout nonce for idempotency
+    checkout_nonce = request.session.get('checkout_nonce')
+    if not checkout_nonce:
+        checkout_nonce = uuid.uuid4().hex
+        request.session['checkout_nonce'] = checkout_nonce
+
     if request.method == 'POST':
+        submitted_nonce = request.POST.get('checkout_nonce')
+        # If this exact checkout submission was already processed, redirect safely to the order
+        if submitted_nonce and submitted_nonce == request.session.get('completed_checkout_nonce'):
+            last_order = request.session.get('last_order_number')
+            if last_order:
+                return redirect('store:order_confirmation', order_number=last_order)
+
         form = CheckoutForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
+                # Lock cart row to prevent concurrent processing of the same cart
+                locked_cart = Cart.objects.select_for_update().get(pk=cart.pk)
+                current_cart_items = list(locked_cart.items.select_for_update().select_related('product').all())
+
+                if not current_cart_items:
+                    last_order = request.session.get('last_order_number')
+                    if last_order:
+                        return redirect('store:order_confirmation', order_number=last_order)
+                    messages.warning(request, "Your bag is empty.")
+                    return redirect('store:product_list')
+
+                # Sort cart items by product_id for deterministic row locking order across concurrent transactions (PostgreSQL deadlock prevention)
+                current_cart_items.sort(key=lambda it: it.product_id)
+
                 # Re-validate stock with row-level locks
-                for item in cart_items:
+                locked_products = {}
+                for item in current_cart_items:
                     prod = Product.objects.select_for_update().get(pk=item.product.pk)
                     if prod.stock < item.quantity:
                         messages.error(request, f"Insufficient stock for {prod.name}. Please review your bag.")
                         return redirect('store:cart_detail')
+                    locked_products[item.product.pk] = prod
 
                 # Create Order
                 order = form.save(commit=False)
                 if request.user.is_authenticated:
                     order.user = request.user
+                else:
+                    guest_orders = request.session.get('guest_orders', [])
+                    if order.order_number not in guest_orders:
+                        guest_orders.append(order.order_number)
+                    request.session['guest_orders'] = guest_orders
+
                 order.total_amount = grand_total
                 order.status = 'processing'
                 order.save()
 
                 # Create OrderItems and safely deduct stock
-                for item in cart_items:
+                for item in current_cart_items:
+                    prod = locked_products[item.product.pk]
                     OrderItem.objects.create(
                         order=order,
-                        product=item.product,
-                        product_name=item.product.name,
-                        price=item.product.price,
+                        product=prod,
+                        product_name=prod.name,
+                        price=prod.price,
                         quantity=item.quantity
                     )
-                    # Safe stock update
-                    prod = Product.objects.get(pk=item.product.pk)
                     prod.stock = max(0, prod.stock - item.quantity)
                     prod.save()
 
                 # Clear cart items
-                cart.items.all().delete()
+                locked_cart.items.all().delete()
+
+                # Record idempotency and last order in session
+                request.session['last_order_number'] = order.order_number
+                if submitted_nonce:
+                    request.session['completed_checkout_nonce'] = submitted_nonce
+                request.session.pop('checkout_nonce', None)
+                request.session.modified = True
 
             messages.success(request, f"Thank you! Your order #{order.order_number} has been placed successfully.")
             return redirect('store:order_confirmation', order_number=order.order_number)
@@ -314,14 +363,35 @@ def checkout(request):
         'subtotal': subtotal,
         'delivery_fee': delivery_fee,
         'grand_total': grand_total,
+        'checkout_nonce': checkout_nonce,
         'page_title': 'Checkout — Luminex',
     }
     return render(request, 'store/checkout.html', context)
 
 
 def order_confirmation(request, order_number):
-    """Order confirmation and receipt."""
+    """Order confirmation and receipt with strict ownership & session verification."""
     order = get_object_or_404(Order, order_number=order_number)
+
+    # Permission verification:
+    # 1. Staff users can inspect any order
+    # 2. Authenticated user who placed the order can view it
+    # 3. Guest user whose active session placed the order can view it
+    has_permission = False
+    if request.user.is_staff:
+        has_permission = True
+    elif order.user is not None:
+        if request.user.is_authenticated and request.user == order.user:
+            has_permission = True
+    else:
+        # Guest order: verify order_number in session guest_orders
+        guest_orders = request.session.get('guest_orders', [])
+        if order.order_number in guest_orders:
+            has_permission = True
+
+    if not has_permission:
+        return HttpResponseForbidden("You do not have permission to view this order confirmation.")
+
     context = {
         'order': order,
         'page_title': f"Order #{order.order_number} Confirmed — Luminex",

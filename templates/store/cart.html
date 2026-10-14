@@ -14,7 +14,7 @@
         <span><strong>Free delivery on this order.</strong> Contactless delivery right to your doorstep.</span>
       {% else %}
         <span style="font-size:1.2rem;">📦</span>
-        <span>Add ₹{{ 5000|add:"-"|add:subtotal }} more to your bag to qualify for <strong>FREE shipping</strong>.</span>
+        <span>Add ₹{{ free_shipping_deficit|floatformat:2 }} more to your bag to qualify for <strong>FREE shipping</strong>.</span>
       {% endif %}
     </div>
 

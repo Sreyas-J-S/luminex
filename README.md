@@ -17,7 +17,7 @@ A complete, production-ready Django e-commerce website built with a premium mini
 - 📦 **Product Detail Pages** — Multi-image gallery, real "Add to Bag", stock status indicators, warranty and delivery perks, and related products
 - 🎯 **Dynamic Banner Management** — Create, edit, delete, enable/disable hero and promotional banners with image uploads
 - 👤 **Authentication & Profile** — User registration, login, logout, profile update, and order history tracking
-- 🛡️ **Security & Robustness** — CSRF protection, transactional checkout, stock race-condition safety, and 24 passing automated tests
+- 🛡️ **Security & Robustness** — CSRF protection, transactional atomic checkout, PostgreSQL deadlock prevention, cryptographic idempotency nonces, order authorization permissions, and 55 passing automated tests
 - 🚀 **Production Ready** — WhiteNoise static files, Gunicorn, PostgreSQL support, and Render build configuration
 
 
@@ -47,7 +47,7 @@ A complete, production-ready Django e-commerce website built with a premium mini
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/luminex.git
+git clone https://github.com/Sreyas-J-S/luminex.git
 cd luminex
 ```
 
@@ -155,6 +155,9 @@ luminex/
 │   │   ├── product_list.html
 │   │   ├── product_detail.html
 │   │   ├── category_detail.html
+│   │   ├── cart.html
+│   │   ├── checkout.html
+│   │   ├── order_confirmation.html
 │   │   └── partials/
 │   │       └── product_card.html
 │   └── accounts/
@@ -234,67 +237,62 @@ In your Render dashboard, create a new PostgreSQL database and copy the **Intern
 
 In your Web Service settings → Environment:
 
-```
+```env
 SECRET_KEY=<generate a strong secret key>
 DEBUG=False
-ALLOWED_HOSTS=yourapp.onrender.com
-DATABASE_URL=<your PostgreSQL internal URL from step 1>
+ALLOWED_HOSTS=<your-app-name>.onrender.com
+CSRF_TRUSTED_ORIGINS=https://<your-app-name>.onrender.com
+DATABASE_URL=<your PostgreSQL Internal Database URL from Render>
 DJANGO_SETTINGS_MODULE=luminex.settings.production
+
+# Persistent Media Storage (AWS S3 or Cloudflare R2):
+AWS_STORAGE_BUCKET_NAME=<your-s3-or-r2-bucket-name>
+AWS_ACCESS_KEY_ID=<your-access-key-id>
+AWS_SECRET_ACCESS_KEY=<your-secret-access-key>
+AWS_S3_REGION_NAME=us-east-1
+# AWS_S3_ENDPOINT_URL=https://<account-id>.r2.cloudflarestorage.com  # (Only if using Cloudflare R2)
 ```
 
 ### 4. Deploy
 
-Push to your GitHub repository connected to Render, or trigger a manual deploy.
+Connect your GitHub repository to Render and trigger a manual or automatic deploy. The `build.sh` script automatically installs dependencies, collects static assets via WhiteNoise, and applies database migrations.
 
-### 5. Create admin user on Render
+### 5. Create admin user & seed demo data on Render
 
-After deployment, run a one-off command in the Render Shell:
+After initial deployment, open the **Shell** tab on Render and run:
 ```bash
-python manage.py createsuperuser
-# Or seed demo data:
 python manage.py seed_demo
 ```
+This provisions default categories, banners, and sample products.
 
 ### Media Files (Production)
 
-For production, uploaded media files (product images, banner images) require object storage. Options:
-- **AWS S3** — Install `django-storages` and `boto3` (already in requirements.txt) and set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_STORAGE_BUCKET_NAME`
-- **Cloudinary** — Alternative cloud image storage
-- **Render Disk** — Attach a persistent disk to your web service (simple but limited)
-
-> ⚠️ Render's ephemeral filesystem means uploaded files are **lost on redeploy** unless you use S3 or a Render Disk.
+Render's Web Services run on an ephemeral container filesystem. Any file written to the local disk is destroyed whenever the service restarts or redeploys. To ensure product images and promotional banners persist indefinitely:
+- **AWS S3 / Cloudflare R2 / Backblaze B2:** Already integrated using `django-storages[boto3]`. Simply supply `AWS_STORAGE_BUCKET_NAME`, `AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` in Render environment variables.
+- When those environment variables are omitted (e.g. local development or test suites), Luminex automatically falls back to standard local file storage without requiring any cloud credentials.
 
 ---
 
-## 🎨 Design System
+## 🎨 Design System & Accessibility
 
-The CSS design system uses CSS custom properties (variables) for complete consistency:
-
-```css
-:root {
-  --color-charcoal: #1d1d1f;   /* Primary dark */
-  --color-blue: #0071e3;        /* Action blue */
-  --color-off-white: #f5f5f7;   /* Background */
-  --font-family: 'Inter', system-ui, sans-serif;
-}
-```
-
-Key components: `.navbar`, `.hero-slider`, `.product-card`, `.category-card`, `.promo-card`, `.btn`, `.auth-card`, `.profile-grid`
+The CSS design system follows Apple HIG principles:
+- **Design Tokens:** Modern CSS variables for colors, typography, elevations, and transitions.
+- **Accessibility:**
+  - Skip-to-main-content keyboard link (`.skip-link`)
+  - WCAG 2.1 AA compliant text contrast (`--color-silver: #6e6e73` with 5.44:1 contrast ratio)
+  - Clear `:focus-visible` keyboard rings
+  - Full support for `prefers-reduced-motion: reduce` across sliders, carousels, and animations.
+- **Checkout Reliability:** Double-click submit disabling with spinner state, server-side idempotency tokens, and row-level stock locks.
 
 ---
 
-## 📝 Incomplete Features / Future Work
+## 📝 Roadmap & Optional Extensions
 
-The following are **not implemented** in this version and require additional work:
-
-1. **Shopping Cart / Checkout** — UI stub exists ("Add to Cart" button) but no cart model or checkout flow
-2. **Order Management** — No Order model or order history
-3. **Payment Integration** — Razorpay/Stripe not integrated
-4. **Media file cloud storage** — Requires S3 or Cloudinary setup for production
-5. **Email verification** — Registration doesn't send a verification email
-6. **Wishlist** — Not implemented
-7. **Product reviews/ratings** — Not implemented
-8. **Pagination** — Product list uses all results (add `django.core.paginator` for large catalogues)
+The following are optional future enhancements:
+1. **Third-party Payment Gateway** — Razorpay / Stripe webhook integration (currently supports card/UPI simulated payment flow)
+2. **Transactional Email Service** — Set `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` to hook into SendGrid or Amazon SES
+3. **Product Reviews & Ratings** — User star ratings and text feedback on product detail pages
+4. **Wishlist** — Saved products list for registered users
 
 ---
 
